@@ -1,0 +1,9 @@
+code.google.com/p/graphics-go
+github.com/Sirupsen/logrus
+github.com/awslabs/aws-sdk-go
+github.com/go-sql-driver/mysql
+github.com/jinzhu/gorm
+github.com/lib/pq
+github.com/nfnt/resize
+github.com/rwcarlsen/goexif
+github.com/vaughan0/go-ini

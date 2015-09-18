@@ -1,0 +1,20 @@
+checkout:
+  post:
+    - rm -rf $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+    - mkdir -p $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME
+    - cp -r $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME
+
+machine:
+  timezone: Asia/Tokyo
+
+dependencies:
+  pre:
+    - go get github.com/nitrous-io/goop
+  override:
+    - goop install
+
+test:
+  override:
+    - goop go test -v ./... -race
+  post:
+    - goop go build -v -o _bin/resizer
