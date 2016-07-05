@@ -3,7 +3,7 @@ package processor
 import (
 	"math"
 
-	"code.google.com/p/graphics-go/graphics"
+	"github.com/BurntSushi/graphics-go/graphics"
 )
 
 func toRadian(d float64) float64 {
