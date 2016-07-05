@@ -15,7 +15,7 @@ import (
 	"os"
 	"reflect"
 
-	"code.google.com/p/graphics-go/graphics/interp"
+	"github.com/BurntSushi/graphics-go/graphics/interp"
 
 	"github.com/go-microservices/resizer/log"
 	"github.com/go-microservices/resizer/storage"

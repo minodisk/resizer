@@ -1,0 +1,25 @@
+package: .
+import:
+- package: github.com/BurntSushi/graphics-go
+  subpackages:
+  - graphics
+  - graphics/interp
+- package: github.com/Sirupsen/logrus
+- package: github.com/aws/aws-sdk-go
+  subpackages:
+  - aws
+  - service/s3
+- package: github.com/go-microservices/resizer
+  subpackages:
+  - fetcher
+  - log
+  - processor
+  - server
+  - storage
+  - uploader
+- package: github.com/go-sql-driver/mysql
+- package: github.com/jinzhu/gorm
+- package: github.com/nfnt/resize
+- package: github.com/rwcarlsen/goexif
+  subpackages:
+  - exif
