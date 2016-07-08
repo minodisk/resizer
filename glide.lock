@@ -1,0 +1,69 @@
+hash: d6cd4563b07ae57f6e0b11a1cc470fb9b28b46f5a3e2b9ba10120dc964da27d2
+updated: 2016-07-08T16:27:52.178734677+09:00
+imports:
+- name: github.com/BurntSushi/graphics-go
+  version: b43f31a4a96688fba0b612e25e22648b9267e498
+  subpackages:
+  - graphics
+  - graphics/interp
+  - graphics/convolve
+- name: github.com/go-sql-driver/mysql
+  version: 3654d25ec346ee8ce71a68431025458d52a38ac0
+- name: github.com/golang/protobuf
+  version: 3852dcfda249c2097355a6aabb199a28d97b30df
+  subpackages:
+  - proto
+- name: github.com/jinzhu/gorm
+  version: 3324ab20633e8c7ec6d6b1f7a714a1a6e06fec08
+- name: github.com/jinzhu/inflection
+  version: 8f4d3a0d04ce0b7c0cf3126fb98524246d00d102
+- name: github.com/nfnt/resize
+  version: 4d93a29130b1b6aba503e2aa8b50f516213ea80e
+- name: github.com/rwcarlsen/goexif
+  version: 709fab3d192d7c62f86043caff1e7e3fb0f42bd8
+  subpackages:
+  - exif
+  - tiff
+- name: github.com/Sirupsen/logrus
+  version: f3cfb454f4c209e6668c95216c4744b8fddb2356
+- name: golang.org/x/net
+  version: f841c39de738b1d0df95b5a7187744f0e03d8112
+  subpackages:
+  - context
+  - context/ctxhttp
+- name: golang.org/x/oauth2
+  version: 7357e96168422ba1e6e7f21075713b72d58764e7
+  subpackages:
+  - google
+  - internal
+  - jws
+  - jwt
+- name: golang.org/x/sys
+  version: a408501be4d17ee978c04a618e7a1b22af058c0e
+  subpackages:
+  - unix
+- name: google.golang.org/api
+  version: c13a21ee847eca050f08db8373d8737494a1170e
+  subpackages:
+  - storage/v1
+  - gensupport
+  - googleapi
+  - googleapi/internal/uritemplates
+- name: google.golang.org/appengine
+  version: 267c27e7492265b84fc6719503b14a1e17975d79
+  subpackages:
+  - urlfetch
+  - internal
+  - internal/app_identity
+  - internal/modules
+  - internal/urlfetch
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/remote_api
+- name: google.golang.org/cloud
+  version: 00a2270cce0a73cdc800dcb7a5e5a2938b800ca8
+  subpackages:
+  - compute/metadata
+  - internal
+devImports: []
