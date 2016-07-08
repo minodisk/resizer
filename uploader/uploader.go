@@ -3,60 +3,69 @@ package uploader
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"os"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/go-microservices/resizer/log"
 	"github.com/go-microservices/resizer/storage"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2/google"
+	gcs "google.golang.org/api/storage/v1"
 )
 
 var (
-	EnvRegion = "RESIZER_S3_REGION"
-	EnvBucket = "RESIZER_S3_BUCKET"
+	EnvGCSProjectID = "RESIZER_GCS_PROJECT_ID"
+	EnvGCSBucket    = "RESIZER_GCS_BUCKET"
+	EnvGCSJSON      = "RESIZER_GCS_SERVICE_ACCOUNT"
 )
 
+const scope = gcs.DevstorageFullControlScope
+
 type Uploader struct {
-	s3.S3
-	region string
-	bucket string
+	service   *gcs.Service
+	projectID string
+	bucket    string
 }
 
 // New はアップローダーを作成する。
 func New() (*Uploader, error) {
-	region := os.Getenv(EnvRegion)
-	if region == "" {
-		return nil, fmt.Errorf("requires environment variable: %s", EnvRegion)
-	}
-	bucket := os.Getenv(EnvBucket)
+	bucket := os.Getenv(EnvGCSBucket)
 	if bucket == "" {
-		return nil, fmt.Errorf("requires environment variable: %s", EnvBucket)
+		return nil, fmt.Errorf("requires environment variable: %s", EnvGCSBucket)
 	}
-	return &Uploader{*s3.New(&aws.Config{Region: region}), region, bucket}, nil
+	projectID := os.Getenv(EnvGCSProjectID)
+	if projectID == "" {
+		return nil, fmt.Errorf("requires environment variable: %s", EnvGCSProjectID)
+	}
+	jsonPath := os.Getenv(EnvGCSJSON)
+	if jsonPath == "" {
+		return nil, fmt.Errorf("requires environment variable: %s", EnvGCSJSON)
+	}
+	jsonFile, err := ioutil.ReadFile(jsonPath)
+	if err != nil {
+		log.Fatalf("Could not open json: %v", err)
+	}
+	config, err := google.JWTConfigFromJSON(jsonFile, scope)
+	if err != nil {
+		log.Fatalf("Could not parse json: %v", err)
+	}
+	client := config.Client(context.Background())
+	service, err := gcs.New(client)
+	if err != nil {
+		log.Fatalf("Unable to create storage service: %v", err)
+	}
+	return &Uploader{service, projectID, bucket}, nil
 }
 
-// Write はデータ buf を filename という名前で contentType と共にアップロードする。
 func (self *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error) {
 	t := log.Start()
 	defer log.End(t)
 
-	data := buf.Bytes()
-	input := &s3.PutObjectInput{
-		ACL:           aws.String("public-read"),
-		Bucket:        aws.String(self.bucket),
-		Key:           aws.String(f.Filename),
-		Body:          bytes.NewReader(data),
-		ContentType:   aws.String(f.ContentType),
-		ContentLength: aws.Long(int64(buf.Len())),
-	}
-	output, err := self.PutObject(input)
-	if err != nil {
-		log.Printf("aws error: %v", err)
-		return "", err
-	}
-
-	if expected := fmt.Sprintf("\"%s\"", f.ETag); *output.ETag != expected {
-		return "", fmt.Errorf("wrong etag: expected=%s actual=%s", expected, *output.ETag)
+	object := &gcs.Object{Name: f.Filename}
+	if res, err := self.service.Objects.Insert(self.bucket, object).Media(buf).Do(); err == nil {
+		fmt.Printf("Created object %v at location %v\n\n", res.Name, res.SelfLink)
+	} else {
+		log.Fatalf("Objects.Insert failed: %v", err)
 	}
 
 	url := self.CreateURL(f.Filename)
@@ -66,5 +75,5 @@ func (self *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error)
 }
 
 func (self *Uploader) CreateURL(path string) string {
-	return fmt.Sprintf("https://s3-%s.amazonaws.com/%s/%s", self.region, self.bucket, path)
+	return fmt.Sprintf("https://%s.storage.googleapis.com/%s", self.bucket, path)
 }
