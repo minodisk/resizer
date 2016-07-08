@@ -1,5 +1,5 @@
 hash: d6cd4563b07ae57f6e0b11a1cc470fb9b28b46f5a3e2b9ba10120dc964da27d2
-updated: 2016-07-08T16:27:52.178734677+09:00
+updated: 2016-07-08T21:55:39.4295972+09:00
 imports:
 - name: github.com/BurntSushi/graphics-go
   version: b43f31a4a96688fba0b612e25e22648b9267e498
@@ -62,7 +62,7 @@ imports:
   - internal/log
   - internal/remote_api
 - name: google.golang.org/cloud
-  version: 00a2270cce0a73cdc800dcb7a5e5a2938b800ca8
+  version: 83ee71d0fec26977bad1662134fa1e8c91268025
   subpackages:
   - compute/metadata
   - internal
