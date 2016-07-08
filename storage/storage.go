@@ -12,11 +12,13 @@ import (
 const (
 	EnvUsername = "RESIZER_DB_USERNAME"
 	EnvPassword = "RESIZER_DB_PASSWORD"
-	EnvEndpoint = "RESIZER_DB_ENDPOINT"
+	EnvProtocol = "RESIZER_DB_PROTOCOL"
+	EnvAddress  = "RESIZER_DB_ADDRESS"
+	EnvName     = "RESIZER_DB_NAME"
 )
 
 type Storage struct {
-	gorm.DB
+	*gorm.DB
 }
 
 func New() (*Storage, error) {
@@ -28,11 +30,19 @@ func New() (*Storage, error) {
 		return nil, fmt.Errorf("requires environment variable: %s", EnvUsername)
 	}
 	password := os.Getenv(EnvPassword)
-	endpoint := os.Getenv(EnvEndpoint)
-	if endpoint == "" {
-		return nil, fmt.Errorf("requires environment variable: %s", EnvEndpoint)
+	protocol := os.Getenv(EnvProtocol)
+	if protocol == "" {
+		return nil, fmt.Errorf("requires environment variable: %s", EnvProtocol)
 	}
-	dsn := fmt.Sprintf("%s:%s@%s?charset=utf8&parseTime=True", username, password, endpoint)
+	address := os.Getenv(EnvAddress)
+	if address == "" {
+		return nil, fmt.Errorf("requires environment variable: %s", EnvAddress)
+	}
+	name := os.Getenv(EnvName)
+	if name == "" {
+		return nil, fmt.Errorf("requires environment variable: %s", EnvName)
+	}
+	dsn := fmt.Sprintf("%s:%s@%s(%s)/%s?charset=utf8&parseTime=True", username, password, protocol, address, name)
 
 	db, err := gorm.Open("mysql", dsn)
 	if err != nil {
