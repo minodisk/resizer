@@ -71,7 +71,7 @@ func TestNew(t *testing.T) {
 	func() {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				if strings.Index(req.URL.Host, "s3-") != 0 {
+				if strings.Contains(req.URL.Host, "googleapis") != true {
 					t.Error("request at the 2nd time shouldn't be redirected")
 				}
 				return nil
@@ -89,7 +89,7 @@ func TestNew(t *testing.T) {
 	func() {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				if strings.Index(req.URL.Host, "s3-") != 0 {
+				if strings.Contains(req.URL.Host, "googleapis") != true {
 					t.Error("request at the 3rd time shouldn't be redirected")
 				}
 				return nil
