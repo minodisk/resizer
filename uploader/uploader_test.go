@@ -27,7 +27,7 @@ func TestUpload(t *testing.T) {
 	content := "test"
 
 	f := storage.Image{
-		ContentType: "plain/text",
+		ContentType: "text/plain; charset=utf-8",
 		ETag:        fmt.Sprintf("%x", md5.Sum([]byte(content))),
 		Filename:    "test/test.txt",
 	}
@@ -59,10 +59,9 @@ func TestUpload(t *testing.T) {
 }
 
 func TestCreateURL(t *testing.T) {
-	region := os.Getenv(uploader.EnvRegion)
-	bucket := os.Getenv(uploader.EnvBucket)
+	bucket := os.Getenv(uploader.EnvGCSBucket)
 	path := "baz"
-	expected := fmt.Sprintf("https://s3-%s.amazonaws.com/%s/%s", region, bucket, path)
+	expected := fmt.Sprintf("https://%s.storage.googleapis.com/%s", bucket, path)
 	actual := u.CreateURL(path)
 	if actual != expected {
 		t.Fatalf("fail to create URL: expected %s, but actual %s", expected, actual)
