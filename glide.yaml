@@ -11,3 +11,5 @@ import:
 - package: github.com/rwcarlsen/goexif
   subpackages:
   - exif
+- package: github.com/alecthomas/kingpin
+  version: ~2.2.0

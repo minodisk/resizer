@@ -4,19 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"github.com/go-microservices/resizer/log"
+	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/storage"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
 	gcs "google.golang.org/api/storage/v1"
-)
-
-var (
-	EnvGCSProjectID = "RESIZER_GCS_PROJECT_ID"
-	EnvGCSBucket    = "RESIZER_GCS_BUCKET"
-	EnvGCSJSON      = "RESIZER_GCS_SERVICE_ACCOUNT"
 )
 
 const scope = gcs.DevstorageFullControlScope
@@ -28,20 +22,8 @@ type Uploader struct {
 }
 
 // New はアップローダーを作成する。
-func New() (*Uploader, error) {
-	bucket := os.Getenv(EnvGCSBucket)
-	if bucket == "" {
-		return nil, fmt.Errorf("requires environment variable: %s", EnvGCSBucket)
-	}
-	projectID := os.Getenv(EnvGCSProjectID)
-	if projectID == "" {
-		return nil, fmt.Errorf("requires environment variable: %s", EnvGCSProjectID)
-	}
-	jsonPath := os.Getenv(EnvGCSJSON)
-	if jsonPath == "" {
-		return nil, fmt.Errorf("requires environment variable: %s", EnvGCSJSON)
-	}
-	jsonFile, err := ioutil.ReadFile(jsonPath)
+func New(o option.Options) (*Uploader, error) {
+	jsonFile, err := ioutil.ReadFile(o.JSON)
 	if err != nil {
 		log.Fatalf("Could not open json: %v", err)
 	}
@@ -54,7 +36,7 @@ func New() (*Uploader, error) {
 	if err != nil {
 		log.Fatalf("Unable to create storage service: %v", err)
 	}
-	return &Uploader{service, projectID, bucket}, nil
+	return &Uploader{service, o.ProjectID, o.Bucket}, nil
 }
 
 func (self *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error) {

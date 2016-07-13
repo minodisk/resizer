@@ -35,7 +35,6 @@ var (
 		"http",
 		"https",
 	}
-	hosts = []string{}
 )
 
 type Image struct {
@@ -61,7 +60,7 @@ type Image struct {
 
 // New はクエリのマップ q から File を作成する。
 // デフォルト値の存在するパラメーターに値が設定されていない場合は、デフォルト値を設定する。
-func NewImage(q map[string][]string) (Image, error) {
+func NewImage(q map[string][]string, hosts []string) (Image, error) {
 	i := Image{}
 	if len(q["url"]) != 0 {
 		i.ValidatedURL = q["url"][0]
@@ -93,21 +92,21 @@ func NewImage(q map[string][]string) (Image, error) {
 		}
 		i.ValidatedQuality = uint8(q)
 	}
-	return i.validate()
+	return i.validate(hosts)
 }
 
 // validate はパラメーターに正しい値が入っているかを検査します。
 // 間違った値が入っている場合はエラーを返す。
-func (i Image) validate() (Image, error) {
+func (i Image) validate(hosts []string) (Image, error) {
 	var err error
-	i, err = i.v()
+	i, err = i.v(hosts)
 	if err != nil {
 		return i, err
 	}
 	return i.serializeValidatedProps()
 }
 
-func (i Image) v() (Image, error) {
+func (i Image) v(hosts []string) (Image, error) {
 	if i.ValidatedURL == "" {
 		return i, fmt.Errorf("url shouldn't be empty")
 	}
@@ -131,6 +130,8 @@ func (i Image) v() (Image, error) {
 		for _, h := range hosts {
 			index := strings.LastIndex(host, h)
 			if index != -1 && index == len(host)-len(h) {
+				return host, true
+			} else if host == "localhost" {
 				return host, true
 			}
 		}

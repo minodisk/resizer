@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/go-microservices/resizer/fetcher"
+	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/server"
 )
 
@@ -26,7 +27,8 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	h, err := server.NewHandler()
+	o, _ := option.New(os.Args[1:])
+	h, err := server.NewHandler(o)
 	if err != nil {
 		panic(err)
 	}
