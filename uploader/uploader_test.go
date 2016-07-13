@@ -9,6 +9,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/storage"
 	"github.com/go-microservices/resizer/uploader"
 )
@@ -17,7 +18,11 @@ var u *uploader.Uploader
 
 func TestNew(t *testing.T) {
 	var err error
-	u, err = uploader.New()
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
+	u, err = uploader.New(o)
 	if err != nil {
 		t.Fatalf("fail to new: error=%v", err)
 	}
@@ -59,7 +64,7 @@ func TestUpload(t *testing.T) {
 }
 
 func TestCreateURL(t *testing.T) {
-	bucket := os.Getenv(uploader.EnvGCSBucket)
+	bucket := os.Getenv("RESIZER_BUCKET")
 	path := "baz"
 	expected := fmt.Sprintf("https://%s.storage.googleapis.com/%s", bucket, path)
 	actual := u.CreateURL(path)

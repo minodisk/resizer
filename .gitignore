@@ -11,6 +11,12 @@ _test
 *.[568vq]
 [568vq].out
 
+# Secret Files
+secret
+
+# Compiled File
+resizer
+
 *.cgo1.go
 *.cgo2.c
 _cgo_defun.c
