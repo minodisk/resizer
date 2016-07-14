@@ -17,7 +17,7 @@ glide install
 ### Run
 
 ```bash
-go run main.go
+go run main.go --id=ID --bucket=BUCKET --json=JSON --dbuser=DBUSER --dbprotocol=DBPROTOCOL --dbaddress=DBADDRESS --dbname=DBNAME
 ```
 
 ローカルで立ち上げてブラウザから試す。
@@ -38,25 +38,41 @@ go test -v ./... -race
 go build -v
 ```
 
-## Run/Test/Build に必要な環境変数
+## Run/Test/Build に必要なフラグオプションと環境変数
 
-### アプリケーション
+### 環境変数
 
-- `RESIZER_LOG_FILENAME`: ログを出力するファイル名です。空にしておくと標準出力にログを出力します。
+#### `RESIZER_LOG_FILENAME`
+ログを出力するファイル名です。空にしておくと標準出力にログを出力します。
 
-### GCP関連(GCS)
+### フラグオプション
 
-- `RESIZER_GCS_SERVICE_ACCOUNT`: GCPのサービスアカウントの秘密鍵であるJSONファイルへのパスです。
-- `RESIZER_GCS_PROJECT_ID`: GCPのプロジェクト名です。
-- `RESIZER_S3_BUCKET`: GCSのバケット名です。
+#### `--id=ID`
+GCPのプロジェクト名です。設定されていなければ環境変数`RESIZER_PROJECT_ID`を使用します。
 
-### DB関連(Cloud SQL)
+#### `--bucket=BUCKET`
+GCSのバケット名です。設定されていなければ環境変数`RESIZER_BUCKET`を使用します。
 
-- `RESIZER_DB_USERNAME`: DBのユーザーネームです。
-- `RESIZER_DB_PASSWORD`: DBのパスワードです。
-- `RESIZER_DB_PROTOCOL`: DBへの接続プロトコルです。詳しくは[こちら](https://github.com/go-sql-driver/mysql#protocol)を参照してください。
-- `RESIZER_DB_ADDRESS`: DBのアドレスです。詳しくは[こちら](https://github.com/go-sql-driver/mysql#address)を参照してください。
-- `RESIZER_DB_NAME`: データベース名です。
+#### `--json=JSON`
+GCPのサービスアカウントの秘密鍵であるJSONファイルへのパスです。設定されていなければ環境変数`RESIZER_JSON`を使用します。
+
+#### `--dbuser=DBUSER`
+DBのユーザーネームです。設定されていなければ環境変数`RESIZER_DB_USER`を使用します。
+
+#### `--dbpassword=""`
+DBのパスワードです。設定されていなければ環境変数`RESIZER_DB_PASSWORD`を使用します。デフォルトは空文字です。
+
+#### `--dbprotocol=DBPROTOCOL`
+DBへの接続プロトコルです。詳しくは[github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql#protocol)を参照してください。設定されていなければ環境変数`RESIZER_DB_PROTOCOL`を使用します。
+
+#### `--dbaddress=DBADDRESS`
+DBのアドレスです。詳しくは[github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql#address)を参照してください。設定されていなければ環境変数`RESIZER_DB_ADDRESS`を使用します。
+
+#### `--dbname=DBNAME`
+データの保存先となるデータベース名です。設定されていなければ環境変数`RESIZER_DB_NAME`を使用します。
+
+#### `--host=HOST ...`
+許可する画像URLのホストです。localhostはデフォルトで許可されています。複数のホストを設定する場合は、`--host=example.com --host=example2.com`のようにします。設定されていなければ環境変数`RESIZER_HOSTS`をカンマで区切ったものを使用します。例: `example.com,example2.com`
 
 ## 定数
 
@@ -69,7 +85,7 @@ go build -v
 ### ベンチマーク
 
 ```bash
-goop go test processor/processor_bench_test.go -bench . -benchmem
+go test processor/processor_bench_test.go -bench . -benchmem
 ```
 
 ### プロファイル
