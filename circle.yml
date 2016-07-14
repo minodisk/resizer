@@ -1,10 +1,8 @@
 checkout:
   post:
     - rm -rf $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-    - mkdir -p $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME
-    - cp -r $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME
-    - go version
-    - cat /etc/lsb-release
+    - mkdir -p $HOME/.go_workspace/src/github.com/go-microservices
+    - cp -r $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_workspace/src/github.com/go-microservices
 
 machine:
   timezone: Asia/Tokyo
@@ -19,27 +17,27 @@ dependencies:
 test:
   pre:
     - mysql -u root -e "CREATE DATABASE resizer;"
-    - echo $GCLOUD_ACCOUNT_JSON | base64 --decode > $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/gcloud.json
+    - echo $GCLOUD_ACCOUNT_JSON | base64 --decode > $HOME/.go_workspace/src/github.com/go-microservices/$CIRCLE_PROJECT_REPONAME/gcloud.json
   override:
-    - go test github.com/syoya/resizer/fetcher
-    - go test github.com/syoya/resizer/log
-    - go test github.com/syoya/resizer/option
-    - go test github.com/syoya/resizer/processor
-    - go test github.com/syoya/resizer/server
-    - go test github.com/syoya/resizer/storage
-    - go test github.com/syoya/resizer/uploader
+    - go test github.com/go-microservices/resizer/fetcher
+    - go test github.com/go-microservices/resizer/log
+    - go test github.com/go-microservices/resizer/option
+    - go test github.com/go-microservices/resizer/processor
+    - go test github.com/go-microservices/resizer/server
+    - go test github.com/go-microservices/resizer/storage
+    - go test github.com/go-microservices/resizer/uploader
   post:
     - go build -v
 
 deployment:
   release:
     branch: release
-  commands:
-    - go get -d github.com/laher/goxc
-    - goxc -wlc default publish-github -apikey=$GITHUB_TOKEN
-    - goxc bump
-    - goxc -bc="linux,windows,darwin"
-    - git config --global user.email "release@circleci.com"
-    - git config --global user.name "CircleCI"
-    - git commit ".goxc.json" -m "Bump version [ci skip]"
-    - git push https://${GITHUB_TOKEN}@github.com/go-microservices/resizer.git release}]
+    commands:
+      - go get -d github.com/laher/goxc
+      - goxc -wlc default publish-github -apikey=$GITHUB_TOKEN
+      - goxc bump
+      - goxc -bc="linux,windows,darwin"
+      - git config --global user.email "release@circleci.com"
+      - git config --global user.name "CircleCI"
+      - git commit ".goxc.json" -m "Bump version [ci skip]"
+      - git push https://${GITHUB_TOKEN}@github.com/go-microservices/resizer.git release
