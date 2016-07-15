@@ -1,14 +1,16 @@
-checkout:
-  post:
-    - rm -rf $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-    - mkdir -p $HOME/.go_workspace/src/github.com/go-microservices
-    - cp -r $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_workspace/src/github.com/go-microservices
-
 machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+    - docker -v
   timezone: Asia/Tokyo
+  services:
+    - docker
 
 dependencies:
+  cache_directories:
+    - ~/.docker
   pre:
+    - sudo pip install docker-compose
     - sudo add-apt-repository ppa:masterminds/glide -y && sudo apt-get update -y
     - sudo apt-get install glide -y
   override:
@@ -16,18 +18,10 @@ dependencies:
 
 test:
   pre:
-    - mysql -u root -e "CREATE DATABASE resizer;"
-    - echo $GCLOUD_ACCOUNT_JSON | base64 --decode > $HOME/.go_workspace/src/github.com/go-microservices/$CIRCLE_PROJECT_REPONAME/gcloud.json
+    - mkdir -p $HOME/$CIRCLE_PROJECT_REPONAME/secret
+    - echo $GCLOUD_ACCOUNT_JSON | base64 --decode > $HOME/$CIRCLE_PROJECT_REPONAME/secret/gcloud.json
   override:
-    - go test github.com/go-microservices/resizer/fetcher
-    - go test github.com/go-microservices/resizer/log
-    - go test github.com/go-microservices/resizer/option
-    - go test github.com/go-microservices/resizer/processor
-    - go test github.com/go-microservices/resizer/server
-    - go test github.com/go-microservices/resizer/storage
-    - go test github.com/go-microservices/resizer/uploader
-  post:
-    - go build -v
+    - ./bin/test
 
 deployment:
   release:
