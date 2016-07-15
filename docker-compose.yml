@@ -1,0 +1,25 @@
+version: '2'
+services:
+  app:
+    build:
+      context: .
+    environment:
+      RESIZER_PROJECT_ID: $RESIZER_PROJECT_ID
+      RESIZER_BUCKET: $RESIZER_BUCKET
+      RESIZER_JSON: $RESIZER_JSON
+      RESIZER_DB_USER: $RESIZER_DB_USER
+      RESIZER_DB_PROTOCOL: $RESIZER_DB_PROTOCOL
+      RESIZER_DB_ADDRESS: $RESIZER_DB_ADDRESS
+      RESIZER_DB_NAME: $RESIZER_DB_NAME
+      RESIZER_HOSTS: $RESIZER_HOSTS
+    volumes:
+      - ./secret:/secret
+    depends_on:
+      - mysql
+    ports:
+      - 80:3000
+  mysql:
+    image: mysql:5.6
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: 'resizer'
