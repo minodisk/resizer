@@ -11,10 +11,8 @@ dependencies:
     - ~/.docker
   pre:
     - sudo pip install docker-compose
-    - sudo add-apt-repository ppa:masterminds/glide -y && sudo apt-get update -y
-    - sudo apt-get install glide -y
   override:
-    - glide install
+    - docker-compose build
 
 test:
   pre:
@@ -27,11 +25,4 @@ deployment:
   release:
     branch: release
     commands:
-      - go get -d github.com/laher/goxc
-      - goxc -wlc default publish-github -apikey=$GITHUB_TOKEN
-      - goxc bump
-      - goxc -bc="linux,windows,darwin"
-      - git config --global user.email "release@circleci.com"
-      - git config --global user.name "CircleCI"
-      - git commit ".goxc.json" -m "Bump version [ci skip]"
-      - git push https://${GITHUB_TOKEN}@github.com/go-microservices/resizer.git release
+      - docker-compose run app ./bin/release

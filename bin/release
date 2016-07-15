@@ -1,0 +1,11 @@
+#!/bin/bash
+
+go get github.com/mitchellh/gox github.com/tcnksm/ghr github.com/syoya/versioner
+gox -output "dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
+versioner bump
+ghr -t $GITHUB_TOKEN -u $GITHUB_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace $(versioner show) dist/
+git config --global user.email "release@circleci.com"
+git config --global user.name "CircleCI"
+git add release_version
+git commit release_version -m "Bump version [ci skip]"
+git push https://${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git release

@@ -16,6 +16,7 @@ secret
 
 # Compiled File
 resizer
+dist
 
 *.cgo1.go
 *.cgo2.c
