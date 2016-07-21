@@ -1,56 +1,64 @@
-hash: d6cd4563b07ae57f6e0b11a1cc470fb9b28b46f5a3e2b9ba10120dc964da27d2
-updated: 2016-07-08T21:55:39.4295972+09:00
+hash: 7ab11c0ce36070d740c3ab57d8b1257ae1b0d64ef1784b6bdd2fbd464ef632af
+updated: 2016-07-12T15:14:44.764319901+09:00
 imports:
+- name: github.com/alecthomas/kingpin
+  version: 92b2733684bc5f1971162349ce098fe0d070e2a9
+- name: github.com/alecthomas/template
+  version: a0175ee3bccc567396460bf5acd36800cb10c49c
+  subpackages:
+  - parse
+- name: github.com/alecthomas/units
+  version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
 - name: github.com/BurntSushi/graphics-go
-  version: b43f31a4a96688fba0b612e25e22648b9267e498
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
   subpackages:
   - graphics
   - graphics/interp
   - graphics/convolve
 - name: github.com/go-sql-driver/mysql
-  version: 3654d25ec346ee8ce71a68431025458d52a38ac0
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
 - name: github.com/golang/protobuf
-  version: 3852dcfda249c2097355a6aabb199a28d97b30df
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
   subpackages:
   - proto
 - name: github.com/jinzhu/gorm
-  version: 3324ab20633e8c7ec6d6b1f7a714a1a6e06fec08
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
 - name: github.com/jinzhu/inflection
-  version: 8f4d3a0d04ce0b7c0cf3126fb98524246d00d102
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
 - name: github.com/nfnt/resize
-  version: 4d93a29130b1b6aba503e2aa8b50f516213ea80e
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
 - name: github.com/rwcarlsen/goexif
-  version: 709fab3d192d7c62f86043caff1e7e3fb0f42bd8
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
   subpackages:
   - exif
   - tiff
 - name: github.com/Sirupsen/logrus
-  version: f3cfb454f4c209e6668c95216c4744b8fddb2356
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
 - name: golang.org/x/net
-  version: f841c39de738b1d0df95b5a7187744f0e03d8112
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
   subpackages:
   - context
   - context/ctxhttp
 - name: golang.org/x/oauth2
-  version: 7357e96168422ba1e6e7f21075713b72d58764e7
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
   subpackages:
   - google
   - internal
   - jws
   - jwt
 - name: golang.org/x/sys
-  version: a408501be4d17ee978c04a618e7a1b22af058c0e
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
   subpackages:
   - unix
 - name: google.golang.org/api
-  version: c13a21ee847eca050f08db8373d8737494a1170e
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
   subpackages:
   - storage/v1
   - gensupport
   - googleapi
   - googleapi/internal/uritemplates
 - name: google.golang.org/appengine
-  version: 267c27e7492265b84fc6719503b14a1e17975d79
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
   subpackages:
   - urlfetch
   - internal
@@ -62,8 +70,8 @@ imports:
   - internal/log
   - internal/remote_api
 - name: google.golang.org/cloud
-  version: 83ee71d0fec26977bad1662134fa1e8c91268025
+  version: cf3b07f3e5a4b3486acb8f61c0586fff1dc45351
   subpackages:
   - compute/metadata
   - internal
-devImports: []
+testImports: []

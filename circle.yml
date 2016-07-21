@@ -1,20 +1,28 @@
-checkout:
-  post:
-    - rm -rf $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
-    - mkdir -p $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME
-    - cp -r $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME
-
 machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+    - docker -v
   timezone: Asia/Tokyo
+  services:
+    - docker
 
 dependencies:
+  cache_directories:
+    - ~/.docker
   pre:
-    - go get github.com/nitrous-io/goop
+    - sudo pip install docker-compose
   override:
-    - goop install
+    - docker-compose build
 
 test:
+  pre:
+    - mkdir -p $HOME/$CIRCLE_PROJECT_REPONAME/secret
+    - echo $GCLOUD_ACCOUNT_JSON | base64 --decode > $HOME/$CIRCLE_PROJECT_REPONAME/secret/gcloud.json
   override:
-    - goop go test -v ./... -race
-  post:
-    - goop go build -v -o _bin/resizer
+    - ./bin/test
+
+deployment:
+  release:
+    branch: release
+    commands:
+      - docker-compose run app ./bin/release

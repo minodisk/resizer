@@ -3,14 +3,20 @@ package storage_test
 import (
 	"fmt"
 	"image"
+	"os"
 	"strconv"
 	"testing"
 
+	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/storage"
 )
 
 func TestNewImage(t *testing.T) {
-	if _, err := storage.NewImage(map[string][]string{}); err == nil {
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
+	if _, err := storage.NewImage(map[string][]string{}, o.Hosts); err == nil {
 		t.Fatalf("fail to NewFile: error=%v", err)
 	}
 
@@ -22,7 +28,7 @@ func TestNewImage(t *testing.T) {
 		"format":  []string{storage.FormatPng},
 		"quality": []string{"80"},
 	}
-	f, err := storage.NewImage(q)
+	f, err := storage.NewImage(q, o.Hosts)
 	if err != nil {
 		t.Fatalf("fail to New: error=%v", err)
 	}
@@ -47,6 +53,10 @@ func TestNewImage(t *testing.T) {
 }
 
 func TestValidateURL(t *testing.T) {
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
 	// ローカルホストと特定のホストとそのサブドメインを許可する
 	for _, host := range []string{
 		"0.0.0.0",
@@ -62,14 +72,14 @@ func TestValidateURL(t *testing.T) {
 			if _, err := storage.NewImage(map[string][]string{
 				"url":   []string{url},
 				"width": []string{"400"},
-			}); err != nil {
+			}, o.Hosts); err != nil {
 				t.Errorf("should allow %s error=%v", url, err)
 			}
 			url = fmt.Sprintf("%s:%d", url, 99999)
 			if _, err := storage.NewImage(map[string][]string{
 				"url":   []string{url},
 				"width": []string{"400"},
-			}); err != nil {
+			}, o.Hosts); err != nil {
 				t.Errorf("should allow %s error=%v", url, err)
 			}
 		}
@@ -83,14 +93,14 @@ func TestValidateURL(t *testing.T) {
 			if _, err := storage.NewImage(map[string][]string{
 				"url":   []string{url},
 				"width": []string{"400"},
-			}); err == nil {
+			}, o.Hosts); err == nil {
 				t.Errorf("shouldn't allow %s", url)
 			}
 			url = fmt.Sprintf("%s:%d", url, 99999)
 			if _, err := storage.NewImage(map[string][]string{
 				"url":   []string{},
 				"width": []string{"400"},
-			}); err == nil {
+			}, o.Hosts); err == nil {
 				t.Errorf("shouldn't allow %s", url)
 			}
 		}
@@ -113,14 +123,14 @@ func TestValidateURL(t *testing.T) {
 			if _, err := storage.NewImage(map[string][]string{
 				"url":   []string{url},
 				"width": []string{"400"},
-			}); err == nil {
+			}, o.Hosts); err == nil {
 				t.Errorf("shouldn't allow %s", url)
 			}
 			url = fmt.Sprintf("%s:%d", url, 99999)
 			if _, err := storage.NewImage(map[string][]string{
 				"url":   []string{url},
 				"width": []string{"400"},
-			}); err == nil {
+			}, o.Hosts); err == nil {
 				t.Errorf("shouldn't allow %s", url)
 			}
 		}
@@ -128,11 +138,15 @@ func TestValidateURL(t *testing.T) {
 }
 
 func TestValidateMethod(t *testing.T) {
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
 	if f, err := storage.NewImage(map[string][]string{
 		"url":    []string{"http://0.0.0.0"},
 		"width":  []string{"400"},
 		"height": []string{"0"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Fatalf("fail to validate: error=%v", err)
 	} else if f.ValidatedMethod != "normal" {
 		t.Errorf("default method should be normal")
@@ -143,7 +157,7 @@ func TestValidateMethod(t *testing.T) {
 		"width":  []string{"400"},
 		"height": []string{"0"},
 		"method": []string{"normal"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Fatalf("fail to validate: error=%v", err)
 	} else if f.ValidatedMethod != "normal" {
 		t.Errorf("format should be normal")
@@ -154,7 +168,7 @@ func TestValidateMethod(t *testing.T) {
 		"width":  []string{"400"},
 		"height": []string{"0"},
 		"method": []string{"thumbnail"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("thumbnail format is allowed")
 	} else if f.ValidatedMethod != "thumbnail" {
 		t.Errorf("format should be thumbnail")
@@ -165,17 +179,21 @@ func TestValidateMethod(t *testing.T) {
 		"width":  []string{"400"},
 		"height": []string{"0"},
 		"method": []string{"foo"},
-	}); err == nil {
+	}, o.Hosts); err == nil {
 		t.Errorf("format other than normal or thumbnail isn't allowed")
 	}
 }
 
 func TestValidateSize(t *testing.T) {
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
 	if _, err := storage.NewImage(map[string][]string{
 		"url":    []string{"http://0.0.0.0"},
 		"width":  []string{"-100"},
 		"height": []string{"100"},
-	}); err == nil {
+	}, o.Hosts); err == nil {
 		t.Errorf("negative width isn't allowed")
 	}
 
@@ -183,7 +201,7 @@ func TestValidateSize(t *testing.T) {
 		"url":    []string{"http://0.0.0.0"},
 		"width":  []string{"100"},
 		"height": []string{"-100"},
-	}); err == nil {
+	}, o.Hosts); err == nil {
 		t.Errorf("negative height isn't allowed")
 	}
 
@@ -191,7 +209,7 @@ func TestValidateSize(t *testing.T) {
 		"url":    []string{"http://0.0.0.0"},
 		"width":  []string{"-100"},
 		"height": []string{"-100"},
-	}); err == nil {
+	}, o.Hosts); err == nil {
 		t.Errorf("negative width and height isn't allowed")
 	}
 
@@ -200,7 +218,7 @@ func TestValidateSize(t *testing.T) {
 			"url":    []string{"http://0.0.0.0"},
 			"width":  []string{"0"},
 			"height": []string{"0"},
-		}); err == nil {
+		}, o.Hosts); err == nil {
 			t.Errorf("zero size isn't allowed")
 		}
 	}()
@@ -209,7 +227,7 @@ func TestValidateSize(t *testing.T) {
 		"url":    []string{"http://0.0.0.0"},
 		"width":  []string{"0"},
 		"height": []string{"100"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("zero width is allowed err=", err)
 	}
 
@@ -217,7 +235,7 @@ func TestValidateSize(t *testing.T) {
 		"url":    []string{"http://0.0.0.0"},
 		"width":  []string{"100"},
 		"height": []string{"0"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("zero height is allowed err=", err)
 	}
 
@@ -225,17 +243,21 @@ func TestValidateSize(t *testing.T) {
 		"url":    []string{"http://0.0.0.0"},
 		"width":  []string{"100"},
 		"height": []string{"100"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("non-zero size is allowed err=", err)
 	}
 }
 
 func TestValidateFormat(t *testing.T) {
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
 	if f, err := storage.NewImage(map[string][]string{
 		"url":    []string{"http://0.0.0.0"},
 		"width":  []string{"400"},
 		"height": []string{"0"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Fatalf("fail to validate: error=%v", err)
 	} else if f.ValidatedFormat != "jpeg" {
 		t.Errorf("default format should be jpeg")
@@ -246,7 +268,7 @@ func TestValidateFormat(t *testing.T) {
 		"width":  []string{"400"},
 		"height": []string{"0"},
 		"format": []string{"jpeg"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("jpeg format is allowed")
 	} else if f.ValidatedFormat != "jpeg" {
 		t.Errorf("format should be jpeg")
@@ -257,7 +279,7 @@ func TestValidateFormat(t *testing.T) {
 		"width":  []string{"400"},
 		"height": []string{"0"},
 		"format": []string{"png"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("png format is allowed")
 	} else if f.ValidatedFormat != "png" {
 		t.Errorf("format should be png")
@@ -268,7 +290,7 @@ func TestValidateFormat(t *testing.T) {
 		"width":  []string{"400"},
 		"height": []string{"0"},
 		"format": []string{"gif"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("gif format is allowed")
 	} else if f.ValidatedFormat != "gif" {
 		t.Errorf("format should be gif")
@@ -279,17 +301,21 @@ func TestValidateFormat(t *testing.T) {
 		"width":  []string{"400"},
 		"height": []string{"0"},
 		"format": []string{"foo"},
-	}); err == nil {
+	}, o.Hosts); err == nil {
 		t.Errorf("format is allowed only jpeg or png or gif")
 	}
 }
 
 func TestValidateQuality(t *testing.T) {
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
 	if f, err := storage.NewImage(map[string][]string{
 		"url":    []string{"http://0.0.0.0"},
 		"width":  []string{"400"},
 		"height": []string{"0"},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("fail to validate: error=%v", err)
 	} else if f.ValidatedQuality != 100 {
 		t.Errorf("default quality should be 100")
@@ -300,7 +326,7 @@ func TestValidateQuality(t *testing.T) {
 		"width":   []string{"400"},
 		"height":  []string{"0"},
 		"quality": []string{"-1"},
-	}); err == nil {
+	}, o.Hosts); err == nil {
 		t.Errorf("negative quality shouldn't be allowed")
 	}
 
@@ -309,7 +335,7 @@ func TestValidateQuality(t *testing.T) {
 		"width":   []string{"400"},
 		"height":  []string{"0"},
 		"quality": []string{"101"},
-	}); err == nil {
+	}, o.Hosts); err == nil {
 		t.Errorf("over 100 quality shouldn't be allowed")
 	}
 
@@ -319,7 +345,7 @@ func TestValidateQuality(t *testing.T) {
 		"height":  []string{"0"},
 		"quality": []string{"67"},
 		"format":  []string{storage.FormatJpeg},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("fail to validate: error=%v", err)
 	} else if f.ValidatedQuality != 67 {
 		t.Errorf("Quality with png format should be 67, but actual %d", f.ValidatedQuality)
@@ -331,7 +357,7 @@ func TestValidateQuality(t *testing.T) {
 		"height":  []string{"0"},
 		"quality": []string{"67"},
 		"format":  []string{storage.FormatPng},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("fail to validate: error=%v", err)
 	} else if f.ValidatedQuality != 0 {
 		t.Errorf("Quality with png format should be 0, but actual %d", f.ValidatedQuality)
@@ -343,7 +369,7 @@ func TestValidateQuality(t *testing.T) {
 		"height":  []string{"0"},
 		"quality": []string{"67"},
 		"format":  []string{storage.FormatGif},
-	}); err != nil {
+	}, o.Hosts); err != nil {
 		t.Errorf("fail to validate: error=%v", err)
 	} else if f.ValidatedQuality != 0 {
 		t.Errorf("Quality with gif format should be 0, but actual %d", f.ValidatedQuality)
@@ -351,6 +377,10 @@ func TestValidateQuality(t *testing.T) {
 }
 
 func TestSerialization(t *testing.T) {
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
 	f1, err := storage.NewImage(map[string][]string{
 		"url":     []string{"http://0.0.0.0"},
 		"width":   []string{"400"},
@@ -358,7 +388,7 @@ func TestSerialization(t *testing.T) {
 		"method":  []string{"thumbnail"},
 		"format":  []string{"png"},
 		"quality": []string{"30"},
-	})
+	}, o.Hosts)
 	if err != nil {
 		t.Fatalf("should be valid image: error=%v", err)
 	}
@@ -371,7 +401,7 @@ func TestSerialization(t *testing.T) {
 		"width":    []string{"400"},
 		"url":      []string{"http://0.0.0.0"},
 		"filename": []string{"dummy"},
-	})
+	}, o.Hosts)
 	if err != nil {
 		t.Fatalf("should be valid image: error=%v", err)
 	}
@@ -383,7 +413,7 @@ func TestSerialization(t *testing.T) {
 		"method":  []string{"thumbnail"},
 		"format":  []string{"png"},
 		"quality": []string{"80"},
-	})
+	}, o.Hosts)
 	if err != nil {
 		t.Fatalf("should be valid image: error=%v", err)
 	}
@@ -400,12 +430,16 @@ func TestSerialization(t *testing.T) {
 }
 
 func TestGuessSizeError(t *testing.T) {
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
 	func() {
 		f, err := storage.NewImage(map[string][]string{
 			"url":    []string{"http://0.0.0.0"},
 			"width":  []string{"200"},
 			"height": []string{"100"},
-		})
+		}, o.Hosts)
 		if err != nil {
 			t.Fatalf("should be valid image: error=%v", err)
 		}
@@ -419,7 +453,7 @@ func TestGuessSizeError(t *testing.T) {
 			"url":    []string{"http://0.0.0.0"},
 			"width":  []string{"200"},
 			"height": []string{"100"},
-		})
+		}, o.Hosts)
 		if err != nil {
 			t.Fatalf("should be valid image: error=%v", err)
 		}
@@ -433,7 +467,7 @@ func TestGuessSizeError(t *testing.T) {
 			"url":    []string{"http://0.0.0.0"},
 			"width":  []string{"200"},
 			"height": []string{"100"},
-		})
+		}, o.Hosts)
 		if err != nil {
 			t.Fatalf("should be valid image: error=%v", err)
 		}
@@ -444,6 +478,10 @@ func TestGuessSizeError(t *testing.T) {
 }
 
 func TestNormalizeWithMethodNormal(t *testing.T) {
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
 	for _, points := range []map[string]image.Point{
 		map[string]image.Point{
 			"source": image.Point{400, 300},
@@ -539,7 +577,7 @@ func TestNormalizeWithMethodNormal(t *testing.T) {
 			"method": []string{storage.MethodNormal},
 			"width":  []string{strconv.Itoa(target.X)},
 			"height": []string{strconv.Itoa(target.Y)},
-		})
+		}, o.Hosts)
 		if err != nil {
 			t.Fatalf("should be valid image: error=%v", err)
 		}
@@ -558,6 +596,10 @@ func TestNormalizeWithMethodNormal(t *testing.T) {
 }
 
 func TestNormalizeWithMethodThumbnail(t *testing.T) {
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		t.Fatalf("fail to create options: error=%v", err)
+	}
 	for i, points := range []map[string]image.Point{
 		map[string]image.Point{
 			"source": image.Point{400, 300},
@@ -629,7 +671,7 @@ func TestNormalizeWithMethodThumbnail(t *testing.T) {
 			"method": []string{"thumbnail"},
 			"width":  []string{strconv.Itoa(target.X)},
 			"height": []string{strconv.Itoa(target.Y)},
-		})
+		}, o.Hosts)
 		if err != nil {
 			t.Fatalf("should be valid image: error=%v", err)
 		}
