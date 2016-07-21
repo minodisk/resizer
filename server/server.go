@@ -8,10 +8,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-microservices/resizer/fetcher"
 	"github.com/go-microservices/resizer/log"
+	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/processor"
 	"github.com/go-microservices/resizer/storage"
 	"github.com/go-microservices/resizer/uploader"
@@ -33,7 +35,11 @@ func Start() error {
 	t := log.Start()
 	defer log.End(t)
 
-	handler, err := NewHandler()
+	o, err := option.New(os.Args[1:])
+	if err != nil {
+		return err
+	}
+	handler, err := NewHandler(o)
 	if err != nil {
 		return err
 	}
@@ -53,18 +59,20 @@ func Start() error {
 type Handler struct {
 	Storage  *storage.Storage
 	Uploader *uploader.Uploader
+	Hosts []string
 }
 
-func NewHandler() (Handler, error) {
-	s, err := storage.New()
+func NewHandler(o option.Options) (Handler, error) {
+	s, err := storage.New(o)
 	if err != nil {
 		return Handler{}, err
 	}
-	u, err := uploader.New()
+	u, err := uploader.New(o)
 	if err != nil {
 		return Handler{}, err
 	}
-	return Handler{s, u}, nil
+	h := o.Hosts
+	return Handler{s, u, h}, nil
 }
 
 // ServeHTTP はリクエストに応じて処理を行いレスポンスする。
@@ -102,7 +110,7 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 	defer log.End(t)
 
 	// 1. URLクエリからリクエストされているオプションを抽出する
-	i, err := storage.NewImage(req.URL.Query())
+	i, err := storage.NewImage(req.URL.Query(), h.Hosts)
 	if err != nil {
 		return err
 	}
