@@ -187,9 +187,6 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 	}
 	b = buf.Bytes()
 
-	h.Storage.NewRecord(i)
-	h.Storage.Create(&i)
-
 	i.ETag = fmt.Sprintf("%x", md5.Sum(b))
 	i.Filename = i.CreateFilename()
 	i.ContentType = contentTypes[i.ValidatedFormat]
@@ -216,6 +213,8 @@ func (h *Handler) save(b []byte, f storage.Image) {
 		log.Errorf("fail to upload: error=%v", err)
 		return
 	}
+	h.Storage.NewRecord(f)
+	h.Storage.Create(&f)
 	h.Storage.Save(&f)
 
 	log.Debugln("complete save")
