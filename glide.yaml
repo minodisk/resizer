@@ -13,3 +13,5 @@ import:
   - exif
 - package: github.com/alecthomas/kingpin
   version: ~2.2.0
+- package: github.com/satori/go.uuid
+  version: v1.1.0
