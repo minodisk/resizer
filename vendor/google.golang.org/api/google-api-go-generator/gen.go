@@ -752,7 +752,17 @@ var pointerFields = []fieldName{
 	{api: "datastore:v1beta2", schema: "Property", field: "Indexed"},
 	{api: "datastore:v1beta2", schema: "Property", field: "IntegerValue"},
 	{api: "datastore:v1beta2", schema: "Property", field: "StringValue"},
+	{api: "datastore:v1beta3", schema: "Value", field: "BlobValue"},
+	{api: "datastore:v1beta3", schema: "Value", field: "BooleanValue"},
+	{api: "datastore:v1beta3", schema: "Value", field: "DoubleValue"},
+	{api: "datastore:v1beta3", schema: "Value", field: "IntegerValue"},
+	{api: "datastore:v1beta3", schema: "Value", field: "StringValue"},
+	{api: "datastore:v1beta3", schema: "Value", field: "TimestampValue"},
 	{api: "genomics:v1beta2", schema: "Dataset", field: "IsPublic"},
+	{api: "monitoring:v3", schema: "TypedValue", field: "BoolValue"},
+	{api: "monitoring:v3", schema: "TypedValue", field: "DoubleValue"},
+	{api: "monitoring:v3", schema: "TypedValue", field: "Int64Value"},
+	{api: "monitoring:v3", schema: "TypedValue", field: "StringValue"},
 	{api: "tasks:v1", schema: "Task", field: "Completed"},
 	{api: "youtube:v3", schema: "ChannelSectionSnippet", field: "Position"},
 }
@@ -1868,10 +1878,7 @@ func (meth *Method) generateCode() {
 		pn(`googleapi.SetOpaque(req.URL)`)
 	}
 
-	pn("if c.ctx_ != nil {")
-	pn(" return ctxhttp.Do(c.ctx_, c.s.client, req)")
-	pn("}")
-	pn("return c.s.client.Do(req)")
+	pn("return gensupport.SendRequest(c.ctx_, c.s.client, req)")
 	pn("}")
 
 	if meth.supportsMediaDownload() {

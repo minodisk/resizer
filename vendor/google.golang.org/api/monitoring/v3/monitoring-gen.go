@@ -1293,7 +1293,7 @@ func (s *Type) MarshalJSON() ([]byte, error) {
 // TypedValue: A single strongly-typed value.
 type TypedValue struct {
 	// BoolValue: A Boolean value: `true` or `false`.
-	BoolValue bool `json:"boolValue,omitempty"`
+	BoolValue *bool `json:"boolValue,omitempty"`
 
 	// DistributionValue: A distribution value.
 	DistributionValue *Distribution `json:"distributionValue,omitempty"`
@@ -1301,13 +1301,13 @@ type TypedValue struct {
 	// DoubleValue: A 64-bit double-precision floating-point number. Its
 	// magnitude is approximately ±10±300 and it has 16 significant digits
 	// of precision.
-	DoubleValue float64 `json:"doubleValue,omitempty"`
+	DoubleValue *float64 `json:"doubleValue,omitempty"`
 
 	// Int64Value: A 64-bit integer. Its range is approximately ±9.2x1018.
-	Int64Value int64 `json:"int64Value,omitempty,string"`
+	Int64Value *int64 `json:"int64Value,omitempty,string"`
 
 	// StringValue: A variable-length string value.
-	StringValue string `json:"stringValue,omitempty"`
+	StringValue *string `json:"stringValue,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "BoolValue") to
 	// unconditionally include in API requests. By default, fields with
@@ -1378,10 +1378,7 @@ func (c *ProjectsCollectdTimeSeriesCreateCall) doRequest(alt string) (*http.Resp
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.collectdTimeSeries.create" call.
@@ -1511,10 +1508,7 @@ func (c *ProjectsGroupsCreateCall) doRequest(alt string) (*http.Response, error)
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.groups.create" call.
@@ -1634,10 +1628,7 @@ func (c *ProjectsGroupsDeleteCall) doRequest(alt string) (*http.Response, error)
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.groups.delete" call.
@@ -1763,10 +1754,7 @@ func (c *ProjectsGroupsGetCall) doRequest(alt string) (*http.Response, error) {
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.groups.get" call.
@@ -1939,10 +1927,7 @@ func (c *ProjectsGroupsListCall) doRequest(alt string) (*http.Response, error) {
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.groups.list" call.
@@ -2117,10 +2102,7 @@ func (c *ProjectsGroupsUpdateCall) doRequest(alt string) (*http.Response, error)
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.groups.update" call.
@@ -2298,10 +2280,7 @@ func (c *ProjectsGroupsMembersListCall) doRequest(alt string) (*http.Response, e
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.groups.members.list" call.
@@ -2469,10 +2448,7 @@ func (c *ProjectsMetricDescriptorsCreateCall) doRequest(alt string) (*http.Respo
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.metricDescriptors.create" call.
@@ -2589,10 +2565,7 @@ func (c *ProjectsMetricDescriptorsDeleteCall) doRequest(alt string) (*http.Respo
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.metricDescriptors.delete" call.
@@ -2719,10 +2692,7 @@ func (c *ProjectsMetricDescriptorsGetCall) doRequest(alt string) (*http.Response
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.metricDescriptors.get" call.
@@ -2878,10 +2848,7 @@ func (c *ProjectsMetricDescriptorsListCall) doRequest(alt string) (*http.Respons
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.metricDescriptors.list" call.
@@ -3047,10 +3014,7 @@ func (c *ProjectsMonitoredResourceDescriptorsGetCall) doRequest(alt string) (*ht
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.monitoredResourceDescriptors.get" call.
@@ -3206,10 +3170,7 @@ func (c *ProjectsMonitoredResourceDescriptorsListCall) doRequest(alt string) (*h
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.monitoredResourceDescriptors.list" call.
@@ -3372,10 +3333,7 @@ func (c *ProjectsTimeSeriesCreateCall) doRequest(alt string) (*http.Response, er
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.timeSeries.create" call.
@@ -3664,10 +3622,7 @@ func (c *ProjectsTimeSeriesListCall) doRequest(alt string) (*http.Response, erro
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "monitoring.projects.timeSeries.list" call.
