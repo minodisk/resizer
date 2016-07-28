@@ -16,9 +16,12 @@ package stat
 
 import (
 	"bytes"
+	"encoding/csv"
 	"fmt"
+	"io"
 	"math"
 	"sort"
+	"strconv"
 	"text/tabwriter"
 	"time"
 )
@@ -68,13 +71,15 @@ func quantile(data []time.Duration, k, q int) (quantile time.Duration, ok bool) 
 }
 
 type Aggregate struct {
-	Min, Median, Max time.Duration
-	P95, P99         time.Duration // percentiles
+	Name               string
+	Count, Errors      int
+	Min, Median, Max   time.Duration
+	P75, P90, P95, P99 time.Duration // percentiles
 }
 
 // NewAggregate constructs an aggregate from latencies. Returns nil if latencies does not contain aggregateable data.
-func NewAggregate(latencies []time.Duration) *Aggregate {
-	var agg Aggregate
+func NewAggregate(name string, latencies []time.Duration, errorCount int) *Aggregate {
+	agg := Aggregate{Name: name, Count: len(latencies), Errors: errorCount}
 
 	if len(latencies) == 0 {
 		return nil
@@ -87,6 +92,12 @@ func NewAggregate(latencies []time.Duration) *Aggregate {
 		return nil
 	}
 	if agg.Max, ok = quantile(latencies, 2, 2); !ok {
+		return nil
+	}
+	if agg.P75, ok = quantile(latencies, 75, 100); !ok {
+		return nil
+	}
+	if agg.P90, ok = quantile(latencies, 90, 100); !ok {
 		return nil
 	}
 	if agg.P95, ok = quantile(latencies, 95, 100); !ok {
@@ -108,4 +119,26 @@ func (agg *Aggregate) String() string {
 		agg.Min, agg.Median, agg.Max, agg.P95, agg.P99)
 	tw.Flush()
 	return buf.String()
+}
+
+// WriteCSV writes a csv file to the given Writer,
+// with a header row and one row per aggregate.
+func WriteCSV(aggs []*Aggregate, iow io.Writer) error {
+	w := csv.NewWriter(iow)
+	defer w.Flush()
+	err := w.Write([]string{"name", "count", "errors", "min", "median", "max", "p75", "p90", "p95", "p99"})
+	if err != nil {
+		return err
+	}
+	for _, agg := range aggs {
+		err = w.Write([]string{
+			agg.Name, strconv.Itoa(agg.Count), strconv.Itoa(agg.Errors),
+			agg.Min.String(), agg.Median.String(), agg.Max.String(),
+			agg.P75.String(), agg.P90.String(), agg.P95.String(), agg.P99.String(),
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -1194,13 +1194,13 @@ type Value struct {
 	// May have at most 1,000,000 bytes.
 	// When `exclude_from_indexes` is false, may have at most 1500 bytes.
 	// In JSON requests, must be base64-encoded.
-	BlobValue string `json:"blobValue,omitempty"`
+	BlobValue *string `json:"blobValue,omitempty"`
 
 	// BooleanValue: A boolean value.
-	BooleanValue bool `json:"booleanValue,omitempty"`
+	BooleanValue *bool `json:"booleanValue,omitempty"`
 
 	// DoubleValue: A double value.
-	DoubleValue float64 `json:"doubleValue,omitempty"`
+	DoubleValue *float64 `json:"doubleValue,omitempty"`
 
 	// EntityValue: An entity value.
 	//
@@ -1219,7 +1219,7 @@ type Value struct {
 	GeoPointValue *LatLng `json:"geoPointValue,omitempty"`
 
 	// IntegerValue: An integer value.
-	IntegerValue int64 `json:"integerValue,omitempty,string"`
+	IntegerValue *int64 `json:"integerValue,omitempty,string"`
 
 	// KeyValue: A key value.
 	KeyValue *Key `json:"keyValue,omitempty"`
@@ -1238,12 +1238,12 @@ type Value struct {
 	// When `exclude_from_indexes` is false (it is indexed) , may have at
 	// most 1500 bytes.
 	// Otherwise, may be set to at least 1,000,000 bytes.
-	StringValue string `json:"stringValue,omitempty"`
+	StringValue *string `json:"stringValue,omitempty"`
 
 	// TimestampValue: A timestamp value.
 	// When stored in the Datastore, precise only to microseconds;
 	// any additional precision is rounded down.
-	TimestampValue string `json:"timestampValue,omitempty"`
+	TimestampValue *string `json:"timestampValue,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "ArrayValue") to
 	// unconditionally include in API requests. By default, fields with
@@ -1313,10 +1313,7 @@ func (c *ProjectsAllocateIdsCall) doRequest(alt string) (*http.Response, error) 
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "datastore.projects.allocateIds" call.
@@ -1438,10 +1435,7 @@ func (c *ProjectsBeginTransactionCall) doRequest(alt string) (*http.Response, er
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "datastore.projects.beginTransaction" call.
@@ -1565,10 +1559,7 @@ func (c *ProjectsCommitCall) doRequest(alt string) (*http.Response, error) {
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "datastore.projects.commit" call.
@@ -1690,10 +1681,7 @@ func (c *ProjectsLookupCall) doRequest(alt string) (*http.Response, error) {
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "datastore.projects.lookup" call.
@@ -1815,10 +1803,7 @@ func (c *ProjectsRollbackCall) doRequest(alt string) (*http.Response, error) {
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "datastore.projects.rollback" call.
@@ -1940,10 +1925,7 @@ func (c *ProjectsRunQueryCall) doRequest(alt string) (*http.Response, error) {
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
 	})
-	if c.ctx_ != nil {
-		return ctxhttp.Do(c.ctx_, c.s.client, req)
-	}
-	return c.s.client.Do(req)
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
 // Do executes the "datastore.projects.runQuery" call.

@@ -6,6 +6,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
+	"github.com/satori/go.uuid"
 	"image"
 	"math"
 	"net/url"
@@ -312,5 +313,6 @@ func (i Image) serializeNormalizedProps() (Image, error) {
 }
 
 func (i Image) CreateFilename() string {
-	return fmt.Sprintf("%s-%d.%s", i.ETag, i.ID, i.ValidatedFormat)
+	uuid := uuid.NewV4().String()
+	return fmt.Sprintf("%s.%s", uuid, i.ValidatedFormat)
 }
