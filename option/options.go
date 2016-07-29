@@ -16,6 +16,7 @@ type Options struct {
 	DBAddress  string
 	DBName     string
 	Hosts      []string
+	MaxConn    int
 }
 
 func New(args []string) (o Options, err error) {
@@ -30,6 +31,7 @@ func New(args []string) (o Options, err error) {
 	DBAddress := app.Flag("dbaddress", "Database address").OverrideDefaultFromEnvar("RESIZER_DB_ADDRESS").Required().String()
 	DBName := app.Flag("dbname", "Database name").OverrideDefaultFromEnvar("RESIZER_DB_NAME").Required().String()
 	FlagHosts := app.Flag("host", "Allowed host").Strings()
+	MaxConn := app.Flag("maxconn", "Max number of current connections").OverrideDefaultFromEnvar("RESIZER_MAX_CONNECTION").Default("10").Int()
 
 	_, err = app.Parse(args)
 	if err != nil {
@@ -54,5 +56,6 @@ func New(args []string) (o Options, err error) {
 		DBAddress:  *DBAddress,
 		DBName:     *DBName,
 		Hosts:      *Hosts,
+		MaxConn:    *MaxConn,
 	}, nil
 }
