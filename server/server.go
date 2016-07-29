@@ -6,7 +6,9 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/net/netutil"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -44,12 +46,15 @@ func Start() error {
 		return err
 	}
 	s := http.Server{
-		Addr:           addr,
 		Handler:        &handler,
 		ReadTimeout:    10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	if err := s.ListenAndServe(); err != nil {
+	l, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+	if err := s.Serve(netutil.LimitListener(l, o.MaxConn)); err != nil {
 		log.Fatalf("fail: err=%v", err)
 	}
 	log.Println("listening: addr=%s", addr)
