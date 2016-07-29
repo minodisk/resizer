@@ -74,6 +74,9 @@ DBのアドレスです。詳しくは[github.com/go-sql-driver/mysql](https://g
 #### `--host=HOST ...`
 許可する画像URLのホストです。localhostはデフォルトで許可されています。複数のホストを設定する場合は、`--host=example.com --host=example2.com`のようにします。設定されていなければ環境変数`RESIZER_HOSTS`をカンマで区切ったものを使用します。例: `example.com,example2.com`
 
+#### `--maxconn=10`
+最大同時接続数です。設定されていなければ環境変数`RESIZER_MAX_CONNECTION`を使用します。デフォルトは10です。
+
 ## 定数
 
 ### サーバーのポート
