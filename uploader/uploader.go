@@ -13,7 +13,10 @@ import (
 	gcs "google.golang.org/api/storage/v1"
 )
 
-const scope = gcs.DevstorageFullControlScope
+const (
+	scope     = gcs.DevstorageFullControlScope
+	sixMonths = 60 * 60 * 24 * 30 * 6
+)
 
 type Uploader struct {
 	service   *gcs.Service
@@ -43,7 +46,7 @@ func (self *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error)
 	t := log.Start()
 	defer log.End(t)
 
-	object := &gcs.Object{Name: f.Filename}
+	object := &gcs.Object{Name: f.Filename, CacheControl: fmt.Sprintf("max-age=%d", sixMonths)}
 	if res, err := self.service.Objects.Insert(self.bucket, object).Media(buf).Do(); err == nil {
 		fmt.Printf("Created object %v at location %v\n\n", res.Name, res.SelfLink)
 	} else {
