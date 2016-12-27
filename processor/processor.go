@@ -12,15 +12,19 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"log"
 	"os"
 	"reflect"
+	"sync"
 
 	"github.com/BurntSushi/graphics-go/graphics/interp"
-
-	"github.com/go-microservices/resizer/log"
 	"github.com/go-microservices/resizer/storage"
 	"github.com/nfnt/resize"
 	"github.com/rwcarlsen/goexif/exif"
+)
+
+var (
+	mutex sync.Mutex
 )
 
 type Processor struct{}
@@ -29,18 +33,42 @@ func New() *Processor {
 	return &Processor{}
 }
 
-// Preprocess はリサイズ処理の前処理を行います。
-// 画像をデコードし、jpegのEXIFの回転情報をピクセルに反映して返します。
-func (self *Processor) Preprocess(path string) (image.Image, error) {
-	t := log.Start()
-	defer log.End(t)
+func (p *Processor) Process(path string, w io.Writer, f storage.Image) (*image.Point, error) {
+	c := make(chan Result)
+	go p.process(&mutex, c, path, w, f)
+	for res := range c {
+		return res.Point, res.Error
+	}
+	return nil, nil
+}
 
+type Result struct {
+	Point *image.Point
+	Error error
+}
+
+func (p *Processor) process(m *sync.Mutex, c chan Result, path string, w io.Writer, f storage.Image) {
+	m.Lock()
+	defer m.Unlock()
+
+	i, err := p.Load(path)
+	if err != nil {
+		c <- Result{nil, err}
+	}
+	pt, err := p.Resize(i, w, f)
+	c <- Result{pt, err}
+}
+
+// Load はリサイズ処理の前処理を行います。
+// 画像をデコードし、jpegのEXIFの回転情報をピクセルに反映して返します。
+func (self *Processor) Load(path string) (image.Image, error) {
 	// ファイルをデコードする
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
+
 	i, format, err := image.Decode(bufio.NewReader(f))
 	if err != nil {
 		log.Println("fail to decode")
@@ -64,30 +92,31 @@ func (self *Processor) Preprocess(path string) (image.Image, error) {
 		log.Println("cancel to apply orientation")
 		return i, nil
 	}
-	log.Debugf("%s -> %s", reflect.TypeOf(i), reflect.TypeOf(io))
+	log.Printf("%s -> %s\n", reflect.TypeOf(i), reflect.TypeOf(io))
 	return io, nil
 }
 
 func orient(r io.Reader, i image.Image) (image.Image, error) {
-	t := log.Start()
-	defer log.End(t)
-
 	e, err := exif.Decode(r)
 	if err != nil {
-		log.Printf("fail to decode exif: %v", err)
+		log.Printf("fail to decode EXIF data: %v\n", err)
 		return nil, err
 	}
 	tag, err := e.Get(exif.Orientation)
 	// Orientationタグが存在しない場合、処理を完了する
 	if err != nil {
-		log.Println("oritentation tag doesn't exist")
+		log.Println("orientation tag doesn't exist")
 		return nil, err
 	}
 	o, err := tag.Int(0)
 	if err != nil {
-		log.Println("oritentation tag is't int")
+		log.Println("orientation tag isn't int")
 		return nil, err
 	}
+
+	// if o == 1 {
+	// 	return i, nil
+	// }
 
 	rect := i.Bounds()
 	// orientation=5~8 なら画像サイズの縦横を入れ替える
@@ -102,7 +131,7 @@ func orient(r io.Reader, i image.Image) (image.Image, error) {
 }
 
 // Process はリサイズ処理を行い、エンコードしたデータを返します。
-func (self *Processor) Process(i image.Image, w io.Writer, f storage.Image) (*image.Point, error) {
+func (self *Processor) Resize(i image.Image, w io.Writer, f storage.Image) (*image.Point, error) {
 	var ir image.Image
 	switch f.ValidatedMethod {
 	default:
