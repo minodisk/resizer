@@ -4,13 +4,14 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"os"
 	"path"
 	"time"
 
-	"github.com/go-microservices/resizer/log"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -23,7 +24,13 @@ var (
 	client  *http.Client
 )
 
-func Init() error {
+func init() {
+	if err := _init(); err != nil {
+		panic(err)
+	}
+}
+
+func _init() error {
 	tempDir = path.Join(os.TempDir(), "")
 	log.Println(tempDir)
 
@@ -45,36 +52,31 @@ func Init() error {
 }
 
 func Fetch(url string) (string, error) {
-	t := log.Start()
-	defer log.End(t)
-
 	sum := md5.Sum([]byte(fmt.Sprintf("%s-%d", url, time.Now().UnixNano())))
 	f := fmt.Sprintf("%x", sum)
 	filename := path.Join(tempDir, f)
-	log.Debugf("file is temporary saved as %s", filename)
+	log.Printf("file is temporary saved as %s\n", filename)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Errorf("fail to new request: error=%v", err)
-		return "", err
+		return "", errors.Wrap(err, "fail to new request")
 	}
 	req.Header.Set("User-Agent", UserAgent)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Errorf("fail to GET %s: error=%v", url, err)
-		return "", err
+		return "", errors.Wrap(err, "fail to GET")
 	}
 
 	dump, _ := httputil.DumpRequest(req, true)
-	log.Debugf("%s", dump)
+	log.Printf("%s\n", dump)
 
 	if resp.StatusCode != http.StatusOK {
-		log.Printf("not ok: StatusCode=%d", resp.StatusCode)
+		log.Printf("not ok: StatusCode=%d\n", resp.StatusCode)
 		return "", fmt.Errorf("can't fetch image %s", url)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			log.Error(err)
+			log.Println(err)
 		}
 	}()
 	log.Printf("ok: StatusCode=%d", resp.StatusCode)
@@ -82,7 +84,7 @@ func Fetch(url string) (string, error) {
 	file, err := os.Create(filename)
 	defer func() {
 		if err := file.Close(); err != nil {
-			log.Error(err)
+			log.Println(err)
 		}
 	}()
 	if err != nil {

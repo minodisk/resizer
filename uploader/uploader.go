@@ -3,62 +3,64 @@ package uploader
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"log"
 
-	"github.com/go-microservices/resizer/log"
+	gcs "cloud.google.com/go/storage"
 	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/storage"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
-	"golang.org/x/oauth2/google"
-	gcs "google.golang.org/api/storage/v1"
+	opt "google.golang.org/api/option"
 )
 
 const (
-	scope     = gcs.DevstorageFullControlScope
+	scope     = gcs.ScopeFullControl
 	sixMonths = 60 * 60 * 24 * 30 * 6
 )
 
 type Uploader struct {
-	service   *gcs.Service
-	projectID string
-	bucket    string
+	context    context.Context
+	bucket     *gcs.BucketHandle
+	bucketName string
 }
 
 // New はアップローダーを作成する。
 func New(o option.Options) (*Uploader, error) {
-	jsonFile, err := ioutil.ReadFile(o.JSON)
+	ctx := context.Background()
+	client, err := gcs.NewClient(ctx, opt.WithScopes(gcs.ScopeFullControl), opt.WithServiceAccountFile(o.JSON))
 	if err != nil {
-		log.Fatalf("Could not open json: %v", err)
+		return nil, errors.Wrap(err, "can't create client for GCS")
 	}
-	config, err := google.JWTConfigFromJSON(jsonFile, scope)
-	if err != nil {
-		log.Fatalf("Could not parse json: %v", err)
-	}
-	client := config.Client(context.Background())
-	service, err := gcs.New(client)
-	if err != nil {
-		log.Fatalf("Unable to create storage service: %v", err)
-	}
-	return &Uploader{service, o.ProjectID, o.Bucket}, nil
+	bkt := client.Bucket(o.Bucket)
+	return &Uploader{ctx, bkt, o.Bucket}, nil
 }
 
-func (self *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error) {
-	t := log.Start()
-	defer log.End(t)
-
-	object := &gcs.Object{Name: f.Filename, CacheControl: fmt.Sprintf("max-age=%d", sixMonths)}
-	if res, err := self.service.Objects.Insert(self.bucket, object).Media(buf).Do(); err == nil {
-		fmt.Printf("Created object %v at location %v\n\n", res.Name, res.SelfLink)
-	} else {
-		log.Fatalf("Objects.Insert failed: %v", err)
+func (u *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error) {
+	object := u.bucket.Object(f.Filename)
+	w := object.NewWriter(u.context)
+	written, err := io.Copy(w, buf)
+	if err != nil {
+		return "", errors.Wrap(err, "can't copy buffer to GCS object writer")
 	}
+	if err := w.Close(); err != nil {
+		return "", errors.Wrap(err, "can't close object writer")
+	}
+	log.Printf("Write %d bytes object '%s' in bucket '%s'", written, f.Filename, u.bucketName)
 
-	url := self.CreateURL(f.Filename)
-	log.Printf("ok: url=%s", url)
+	attrs, err := object.Update(u.context, gcs.ObjectAttrsToUpdate{
+		ContentType:  f.ContentType,
+		CacheControl: fmt.Sprintf("max-age=%d", sixMonths),
+	})
+	if err != nil {
+		return "", errors.Wrap(err, "can't update object attributes")
+	}
+	log.Printf("Attributes: %+v", *attrs)
 
+	url := u.CreateURL(f.Filename)
 	return url, nil
 }
 
-func (self *Uploader) CreateURL(path string) string {
-	return fmt.Sprintf("https://%s.storage.googleapis.com/%s", self.bucket, path)
+func (u *Uploader) CreateURL(path string) string {
+	return fmt.Sprintf("https://%s.storage.googleapis.com/%s", u.bucketName, path)
 }

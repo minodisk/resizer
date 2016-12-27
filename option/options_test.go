@@ -1,10 +1,11 @@
 package option_test
 
 import (
-	"github.com/go-microservices/resizer/option"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/go-microservices/resizer/option"
 )
 
 func TestFlags(t *testing.T) {
@@ -56,6 +57,21 @@ func TestFlags(t *testing.T) {
 }
 
 func TestEnvar(t *testing.T) {
+	for key, value := range map[string]string{
+		"RESIZER_PROJECT_ID":  "AAAA",
+		"RESIZER_BUCKET":      "BBBB",
+		"RESIZER_JSON":        "CCCC",
+		"RESIZER_DB_USER":     "DDDD",
+		"RESIZER_DB_PASSWORD": "EEEE",
+		"RESIZER_DB_PROTOCOL": "FFFF",
+		"RESIZER_DB_ADDRESS":  "GGGG",
+		"RESIZER_DB_NAME":     "HHHH",
+		"RESIZER_HOSTS":       "IIII,JJJJ",
+	} {
+		if err := os.Setenv(key, value); err != nil {
+			t.Fatal(err)
+		}
+	}
 	o, err := option.New([]string{})
 	if err != nil {
 		t.Fatal(err)
