@@ -3,50 +3,55 @@ package server_test
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/go-microservices/resizer/fetcher"
 	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/server"
 )
 
 var (
-	appServer  *httptest.Server
-	mockServer *httptest.Server
+	appServer      *httptest.Server
+	fixturesServer *httptest.Server
 )
 
 func TestMain(m *testing.M) {
-	if err := fetcher.Init(); err != nil {
-		panic(err)
-	}
-
-	o, _ := option.New(os.Args[1:])
-	h, err := server.NewHandler(o)
-	if err != nil {
-		panic(err)
-	}
-	appServer = httptest.NewServer(http.HandlerFunc(h.ServeHTTP))
-	mockServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	fixturesServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		dir, err := os.Getwd()
 		if err != nil {
 			panic(err)
 		}
 		p := path.Join(dir, "..", "fixtures", r.URL.Path[1:])
-		log.Println(p)
 		http.ServeFile(w, r, p)
 	}))
+	u, err := url.Parse(fixturesServer.URL)
+	if err != nil {
+		panic(err)
+	}
+
+	h, err := server.NewHandler(option.Options{
+		DBUser:     "root",
+		DBProtocol: "tcp",
+		DBAddress:  "mysql:3306",
+		DBName:     "resizer",
+		JSON:       "/secret/account.json",
+		Hosts:      []string{u.Host},
+	})
+	if err != nil {
+		panic(err)
+	}
+	appServer = httptest.NewServer(http.HandlerFunc(h.ServeHTTP))
 
 	c := m.Run()
 
 	appServer.Close()
-	mockServer.Close()
+	fixturesServer.Close()
 
 	os.Exit(c)
 }
@@ -59,7 +64,7 @@ func TestNew(t *testing.T) {
 				return nil
 			},
 		}
-		resp, err := client.Get(fmt.Sprintf("%s?width=15&url=%s/f-png24.png", appServer.URL, mockServer.URL))
+		resp, err := client.Get(fmt.Sprintf("%s?width=15&url=%s/f-png24.png", appServer.URL, fixturesServer.URL))
 		if err != nil {
 			t.Fatalf("fail to get resized image at the 1st time: error=%v", err)
 		}
@@ -79,7 +84,7 @@ func TestNew(t *testing.T) {
 				return nil
 			},
 		}
-		resp, err := client.Get(fmt.Sprintf("%s?width=15&url=%s/f-png24.png", appServer.URL, mockServer.URL))
+		resp, err := client.Get(fmt.Sprintf("%s?width=15&url=%s/f-png24.png", appServer.URL, fixturesServer.URL))
 		if err != nil {
 			t.Fatalf("fail to get resized image at the 2st time: error=%v", err)
 		}
@@ -97,7 +102,7 @@ func TestNew(t *testing.T) {
 				return nil
 			},
 		}
-		resp, err := client.Get(fmt.Sprintf("%s?height=21&url=%s/f-png24.png", appServer.URL, mockServer.URL))
+		resp, err := client.Get(fmt.Sprintf("%s?height=21&url=%s/f-png24.png", appServer.URL, fixturesServer.URL))
 		if err != nil {
 			t.Errorf("fail to get resized image at the 3rd time: error=%v", err)
 		}

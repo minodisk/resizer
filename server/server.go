@@ -6,19 +6,20 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/netutil"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/go-microservices/resizer/fetcher"
-	"github.com/go-microservices/resizer/log"
 	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/processor"
 	"github.com/go-microservices/resizer/storage"
 	"github.com/go-microservices/resizer/uploader"
+	"github.com/pkg/errors"
+	"golang.org/x/net/netutil"
 )
 
 const (
@@ -34,9 +35,6 @@ var (
 )
 
 func Start() error {
-	t := log.Start()
-	defer log.End(t)
-
 	o, err := option.New(os.Args[1:])
 	if err != nil {
 		return err
@@ -55,16 +53,15 @@ func Start() error {
 		return err
 	}
 	if err := s.Serve(netutil.LimitListener(l, o.MaxConn)); err != nil {
-		log.Fatalf("fail: err=%v", err)
+		return errors.Wrap(err, "fail to serve")
 	}
-	log.Println("listening: addr=%s", addr)
 	return nil
 }
 
 type Handler struct {
 	Storage  *storage.Storage
 	Uploader *uploader.Uploader
-	Hosts []string
+	Hosts    []string
 }
 
 func NewHandler(o option.Options) (Handler, error) {
@@ -82,40 +79,42 @@ func NewHandler(o option.Options) (Handler, error) {
 
 // ServeHTTP はリクエストに応じて処理を行いレスポンスする。
 func (h *Handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	t := log.Start()
-	defer log.End(t)
-
 	if req.URL.Path != "/" {
 		resp.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(resp, "Not Found")
-		log.Infof("not found")
+		log.Println("not found")
 		return
 	}
 
 	if err := h.operate(resp, req); err != nil {
-		log.Infof("fail to operate: error=%v", err)
+		log.Println("fail to operate: error=%v", err)
 		resp.WriteHeader(http.StatusBadRequest)
 		enc := json.NewEncoder(resp)
 		obj := map[string]string{
 			"message": err.Error(),
 		}
 		if err := enc.Encode(obj); err != nil {
-			log.Errorf("fail to encode error message to JSON: error=%v", err)
+			log.Println("fail to encode error message to JSON: error=%v", err)
 		}
 		return
 	}
 
-	log.Infof("ok")
+	log.Println("ok")
 }
 
 // operate は手続き的に一連のリサイズ処理を行う。
 // エラーを画一的に扱うためにメソッドとして切り分けを行っている
 func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
-	t := log.Start()
-	defer log.End(t)
-
 	// 1. URLクエリからリクエストされているオプションを抽出する
-	i, err := storage.NewImage(req.URL.Query(), h.Hosts)
+	input, err := storage.NewInput(req.URL.Query())
+	if err != nil {
+		return err
+	}
+	input, err = input.Validate(h.Hosts)
+	if err != nil {
+		return err
+	}
+	i, err := storage.NewImage(input)
 	if err != nil {
 		return err
 	}
@@ -131,21 +130,21 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 		ValidatedFormat:  i.ValidatedFormat,
 		ValidatedQuality: i.ValidatedQuality,
 	}).First(&cache)
-	log.Debugln(cache.ID)
+	log.Println(cache.ID)
 	if cache.ID != 0 {
-		log.Infof("validated cache %+v exists, requested with %+v", cache, i)
+		log.Println("validated cache %+v exists, requested with %+v", cache, i)
 		url := h.Uploader.CreateURL(cache.Filename)
 		http.Redirect(resp, req, url, http.StatusSeeOther)
 		return nil
 	}
-	log.Infof("validated cache doesn't exist, requested with %+v", i)
+	log.Println("validated cache doesn't exist, requested with %+v", i)
 
 	// 5. 元画像を取得する
 	// 6. リサイズの前処理をする
 	filename, err := fetcher.Fetch(i.ValidatedURL)
 	defer func() {
 		if err := fetcher.Clean(filename); err != nil {
-			log.Errorf("fail to clean fetched file: %s", filename)
+			log.Println("fail to clean fetched file: %s", filename)
 		}
 	}()
 	if err != nil {
@@ -154,7 +153,7 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 	var b []byte
 	buf := bytes.NewBuffer(b)
 	p := processor.New()
-	pixels, err := p.Preprocess(filename)
+	pixels, err := p.Load(filename)
 	if err != nil {
 		return err
 	}
@@ -176,17 +175,17 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 		ValidatedQuality: i.ValidatedQuality,
 	}).First(&cache)
 	if cache.ID != 0 {
-		log.Infof("normalized cache %+v exists, requested with %+v", cache, i)
+		log.Println("normalized cache %+v exists, requested with %+v", cache, i)
 		url := h.Uploader.CreateURL(cache.Filename)
 		http.Redirect(resp, req, url, http.StatusSeeOther)
 		return nil
 	}
-	log.Infof("normalized cache doesn't exist, requested with %+v", i)
+	log.Println("normalized cache doesn't exist, requested with %+v", i)
 
 	// 10. リサイズする
 	// 11. ファイルオブジェクトの処理結果フィールドを埋める
 	// 12. レスポンスする
-	size, err := p.Process(pixels, buf, i)
+	size, err := p.Resize(pixels, buf, i)
 	if err != nil {
 		return err
 	}
@@ -209,18 +208,15 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 
 // save はファイルやデータを保存します。
 func (h *Handler) save(b []byte, f storage.Image) {
-	t := log.Start()
-	defer log.End(t)
-
 	// 13. アップロードする
 	// 14. キャッシュをDBに格納する
 	if _, err := h.Uploader.Upload(bytes.NewBuffer(b), f); err != nil {
-		log.Errorf("fail to upload: error=%v", err)
+		log.Println("fail to upload: error=%v", err)
 		return
 	}
 	h.Storage.NewRecord(f)
 	h.Storage.Create(&f)
 	h.Storage.Save(&f)
 
-	log.Debugln("complete save")
+	log.Println("complete to save")
 }

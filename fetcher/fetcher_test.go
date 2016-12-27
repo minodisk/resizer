@@ -33,12 +33,6 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestInit(t *testing.T) {
-	if err := fetcher.Init(); err != nil {
-		log.Fatal(err)
-	}
-}
-
 func TestFetchAndClean(t *testing.T) {
 	// モックサーバから期待値となるファイルのデータを取得する
 	url := fmt.Sprintf("%s/f-png24.png", mockServer.URL)

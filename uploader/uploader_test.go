@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"testing"
@@ -49,10 +50,15 @@ func TestUpload(t *testing.T) {
 		t.Fatalf("fail to upload: error=%v", err)
 	}
 	defer resp.Body.Close()
+
 	ct := resp.Header.Get("Content-Type")
 	if ct != f.ContentType {
 		t.Fatalf("wrong Content-Type: expected %s, but actual %s", f.ContentType, ct)
 	}
+
+	cc := resp.Header.Get("Cache-Control")
+	log.Println(cc)
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("fail to read body: error=%v", err)

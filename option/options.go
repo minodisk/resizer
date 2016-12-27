@@ -1,9 +1,10 @@
 package option
 
 import (
-	"github.com/alecthomas/kingpin"
 	"os"
 	"strings"
+
+	"github.com/alecthomas/kingpin"
 )
 
 type Options struct {
