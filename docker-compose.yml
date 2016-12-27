@@ -1,26 +1,27 @@
 version: '2'
+
 services:
+
   app:
     build:
       context: .
     environment:
-      RESIZER_PROJECT_ID: $RESIZER_PROJECT_ID
-      RESIZER_BUCKET: $RESIZER_BUCKET
-      RESIZER_JSON: $RESIZER_JSON
-      RESIZER_DB_USER: $RESIZER_DB_USER
-      RESIZER_DB_PROTOCOL: $RESIZER_DB_PROTOCOL
-      RESIZER_DB_ADDRESS: $RESIZER_DB_ADDRESS
-      RESIZER_DB_NAME: $RESIZER_DB_NAME
-      RESIZER_HOSTS: $RESIZER_HOSTS
-      GITHUB_TOKEN: $GITHUB_TOKEN
-      GITHUB_USERNAME: $GITHUB_USERNAME
-      CIRCLE_PROJECT_REPONAME: $CIRCLE_PROJECT_REPONAME
+      RESIZER_PROJECT_ID: syoya-tests
+      RESIZER_BUCKET: resizer
+      RESIZER_JSON: /secret/account.json
+      RESIZER_DB_USER: root
+      RESIZER_DB_PROTOCOL: tcp
+      RESIZER_DB_ADDRESS: mysql:3306
+      RESIZER_DB_NAME: resizer
+      # RESIZER_HOSTS: $RESIZER_HOSTS
     volumes:
-      - ./secret:/secret
+      # - .:/go/src/github.com/go-microservices/resizer
+      - ./.secret:/secret
     depends_on:
       - mysql
     ports:
       - 80:3000
+
   mysql:
     image: mysql:5.6
     environment:
