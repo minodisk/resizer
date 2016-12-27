@@ -6,36 +6,11 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
-	"github.com/satori/go.uuid"
 	"image"
 	"math"
-	"net/url"
-	"regexp"
-	"strconv"
-	"strings"
 	"time"
-)
 
-const (
-	MethodNormal    = "normal"
-	MethodThumbnail = "thumbnail"
-	MethodDefault   = MethodNormal
-
-	FormatJpeg    = "jpeg"
-	FormatPng     = "png"
-	FormatGif     = "gif"
-	FormatDefault = FormatJpeg
-
-	QualityMax     = 100
-	QualityMin     = 0
-	QualityDefault = QualityMin
-)
-
-var (
-	schemes = []string{
-		"http",
-		"https",
-	}
+	uuid "github.com/satori/go.uuid"
 )
 
 type Image struct {
@@ -45,9 +20,9 @@ type Image struct {
 	ValidatedURL     string `sql:"type:text"`
 	ValidatedMethod  string
 	ValidatedFormat  string
-	ValidatedQuality uint8
 	ValidatedWidth   int
 	ValidatedHeight  int
+	ValidatedQuality int
 	ValidatedHash    string `sql:"size:32;index"`
 	DestWidth        int
 	DestHeight       int
@@ -61,119 +36,15 @@ type Image struct {
 
 // New はクエリのマップ q から File を作成する。
 // デフォルト値の存在するパラメーターに値が設定されていない場合は、デフォルト値を設定する。
-func NewImage(q map[string][]string, hosts []string) (Image, error) {
-	i := Image{}
-	if len(q["url"]) != 0 {
-		i.ValidatedURL = q["url"][0]
-	}
-	if len(q["method"]) != 0 {
-		i.ValidatedMethod = q["method"][0]
-	}
-	if len(q["width"]) != 0 {
-		w, err := strconv.Atoi(q["width"][0])
-		if err != nil {
-			return i, err
-		}
-		i.ValidatedWidth = w
-	}
-	if len(q["height"]) != 0 {
-		h, err := strconv.Atoi(q["height"][0])
-		if err != nil {
-			return i, err
-		}
-		i.ValidatedHeight = h
-	}
-	if len(q["format"]) != 0 {
-		i.ValidatedFormat = q["format"][0]
-	}
-	if len(q["quality"]) != 0 {
-		q, err := strconv.ParseUint(q["quality"][0], 10, 8)
-		if err != nil {
-			return i, err
-		}
-		i.ValidatedQuality = uint8(q)
-	}
-	return i.validate(hosts)
-}
-
-// validate はパラメーターに正しい値が入っているかを検査します。
-// 間違った値が入っている場合はエラーを返す。
-func (i Image) validate(hosts []string) (Image, error) {
-	var err error
-	i, err = i.v(hosts)
-	if err != nil {
-		return i, err
-	}
-	return i.serializeValidatedProps()
-}
-
-func (i Image) v(hosts []string) (Image, error) {
-	if i.ValidatedURL == "" {
-		return i, fmt.Errorf("url shouldn't be empty")
-	}
-	u, err := url.Parse(i.ValidatedURL)
-	if err != nil {
-		return i, err
-	}
-	isValidScheme := func() bool {
-		for _, scheme := range schemes {
-			if scheme == u.Scheme {
-				return true
-			}
-		}
-		return false
-	}()
-	if !isValidScheme {
-		return i, fmt.Errorf("the scheme of url is allowed %s", strings.Join(schemes, " or "))
-	}
-	host, isValidHost := func() (string, bool) {
-		host := strings.Split(u.Host, ":")[0]
-		for _, h := range hosts {
-			index := strings.LastIndex(host, h)
-			if index != -1 && index == len(host)-len(h) {
-				return host, true
-			} else if host == "localhost" {
-				return host, true
-			}
-		}
-		r := regexp.MustCompile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")
-		if r.MatchString(host) {
-			return host, true
-		}
-		return host, false
-	}()
-	if !isValidHost {
-		return i, fmt.Errorf("the host '%s' isn't allowed", host)
-	}
-
-	if i.ValidatedWidth < 0 || i.ValidatedHeight < 0 {
-		return i, fmt.Errorf("size should be specified with positive value: width=%d, height=%d", i.ValidatedWidth, i.ValidatedHeight)
-	}
-	if i.ValidatedWidth == 0 && i.ValidatedHeight == 0 {
-		return i, fmt.Errorf("size should not be zero: width=%d, height=%d", i.ValidatedWidth, i.ValidatedHeight)
-	}
-
-	if i.ValidatedMethod == "" {
-		i.ValidatedMethod = MethodDefault
-	} else if !(i.ValidatedMethod == MethodDefault || i.ValidatedMethod == MethodThumbnail) {
-		return i, fmt.Errorf("method '%s' isn't allowed, specify with %s or %s", i.ValidatedMethod, MethodDefault, MethodThumbnail)
-	}
-
-	if i.ValidatedFormat == "" {
-		i.ValidatedFormat = FormatDefault
-	} else if !(i.ValidatedFormat == FormatJpeg || i.ValidatedFormat == FormatPng || i.ValidatedFormat == FormatGif) {
-		return i, fmt.Errorf("format '%s' isn't allowed, specify with %s, %s or %s", i.ValidatedFormat, FormatJpeg, FormatPng, FormatGif)
-	}
-
-	if i.ValidatedFormat != FormatJpeg {
-		i.ValidatedQuality = QualityDefault
-	} else if i.ValidatedQuality == QualityDefault {
-		i.ValidatedQuality = 100
-	} else if i.ValidatedQuality < QualityMin || QualityMax < i.ValidatedQuality {
-		return i, fmt.Errorf("quality %d should be specify between %d and %d", i.ValidatedQuality, QualityMin, QualityMax)
-	}
-
-	return i, nil
+func NewImage(input Input) (Image, error) {
+	return Image{
+		ValidatedURL:     input.URL,
+		ValidatedMethod:  input.Method,
+		ValidatedWidth:   input.Width,
+		ValidatedHeight:  input.Height,
+		ValidatedFormat:  input.Format,
+		ValidatedQuality: input.Quality,
+	}.serializeValidatedProps()
 }
 
 func (i Image) serializeValidatedProps() (Image, error) {
@@ -313,6 +184,6 @@ func (i Image) serializeNormalizedProps() (Image, error) {
 }
 
 func (i Image) CreateFilename() string {
-	uuid := uuid.NewV4().String()
-	return fmt.Sprintf("%s.%s", uuid, i.ValidatedFormat)
+	id := uuid.NewV4().String()
+	return fmt.Sprintf("%s.%s", id, i.ValidatedFormat)
 }
