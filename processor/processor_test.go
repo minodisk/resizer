@@ -98,7 +98,7 @@ func eval(t *testing.T, path string, f storage.Image, size image.Point, colors [
 	p := processor.New()
 	f.ValidatedWidth *= u
 	f.ValidatedHeight *= u
-	pixels, err := p.Preprocess(path)
+	pixels, err := p.Load(path)
 	if err != nil {
 		t.Fatalf("cannot preprocess image: error=%v", err)
 	}
@@ -108,7 +108,7 @@ func eval(t *testing.T, path string, f storage.Image, size image.Point, colors [
 		t.Fatalf("fail to normalize: error=%v", err)
 	}
 
-	if _, err := p.Process(pixels, w, f); err != nil {
+	if _, err := p.Resize(pixels, w, f); err != nil {
 		t.Fatalf("cannot process image: %v", err)
 		return ""
 	}
