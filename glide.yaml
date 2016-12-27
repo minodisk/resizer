@@ -1,17 +1,30 @@
-package: .
+package: github.com/go-microservices/resizer
 import:
 - package: github.com/BurntSushi/graphics-go
   subpackages:
   - graphics
   - graphics/interp
-- package: github.com/Sirupsen/logrus
+- package: github.com/alecthomas/kingpin
+  version: ^2.2.3
 - package: github.com/go-sql-driver/mysql
+  version: ^1.3.0
 - package: github.com/jinzhu/gorm
+  version: ^1.0.0
 - package: github.com/nfnt/resize
+- package: github.com/pkg/errors
+  version: ^0.8.0
 - package: github.com/rwcarlsen/goexif
   subpackages:
   - exif
-- package: github.com/alecthomas/kingpin
-  version: ~2.2.0
 - package: github.com/satori/go.uuid
-  version: v1.1.0
+  version: ^1.1.0
+- package: golang.org/x/net
+  subpackages:
+  - context
+  - netutil
+- package: golang.org/x/oauth2
+  subpackages:
+  - google
+- package: google.golang.org/api
+  subpackages:
+  - storage/v1
