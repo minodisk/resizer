@@ -8,7 +8,7 @@ services:
     environment:
       RESIZER_PROJECT_ID: syoya-tests
       RESIZER_BUCKET: resizer
-      RESIZER_JSON: /secret/account.json
+      RESIZER_JSON: /secret/gcloud.json
       RESIZER_DB_USER: root
       RESIZER_DB_PROTOCOL: tcp
       RESIZER_DB_ADDRESS: mysql:3306
@@ -16,7 +16,7 @@ services:
       # RESIZER_HOSTS: $RESIZER_HOSTS
     volumes:
       # - .:/go/src/github.com/go-microservices/resizer
-      - ./.secret:/secret
+      - ./secret:/secret
     depends_on:
       - mysql
     ports:
