@@ -1,0 +1,6 @@
+#!/bin/bash
+
+docker run -it \
+  -v $(pwd):/go/src/github.com/go-microservices/resizer \
+  -u $(id -u):$(id -g) \
+  resizer_app glide $@
