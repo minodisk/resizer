@@ -11,6 +11,15 @@ _test
 *.[568vq]
 [568vq].out
 
+# git
+.git
+
+# glide
+.glide
+
+# secret
+.secret
+
 # Secret Files
 secret
 
@@ -34,3 +43,4 @@ _testmain.go
 
 _bin
 .vendor
+vendor
