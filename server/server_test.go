@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 		DBProtocol: "tcp",
 		DBAddress:  "mysql:3306",
 		DBName:     "resizer",
-		JSON:       "/secret/account.json",
+		JSON:       "/secret/gcloud.json",
 		Hosts:      []string{u.Host},
 	})
 	if err != nil {
