@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -21,15 +20,13 @@ type Storage struct {
 }
 
 func New(o option.Options) (*Storage, error) {
-	dsn := fmt.Sprintf("%s:%s@%s(%s)/%s?charset=utf8&parseTime=True", o.DBUser, o.DBPassword, o.DBProtocol, o.DBAddress, o.DBName)
-
-	db, err := gorm.Open("mysql", dsn)
+	db, err := gorm.Open("mysql", o.MysqlDataSourceName)
 	if err != nil {
 		return nil, err
 	}
 	// db.LogMode(true)
-	db.SetLogger(&Logger{})
-	if os.Getenv("ENVIRONMENT") == "develop" {
+	// db.SetLogger(&Logger{})
+	if os.Getenv("ENVIRONMENT") == "development" {
 		db.DropTable(&Image{})
 	}
 	db.CreateTable(&Image{})
