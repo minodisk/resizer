@@ -32,7 +32,6 @@ func init() {
 
 func _init() error {
 	tempDir = path.Join(os.TempDir(), "")
-	log.Println(tempDir)
 
 	var err error
 	expires, err = time.ParseDuration("1h")

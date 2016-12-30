@@ -18,6 +18,7 @@ import (
 	"sync"
 
 	"github.com/BurntSushi/graphics-go/graphics/interp"
+	"github.com/go-microservices/resizer/input"
 	"github.com/go-microservices/resizer/storage"
 	"github.com/nfnt/resize"
 	"github.com/rwcarlsen/goexif/exif"
@@ -76,7 +77,7 @@ func (self *Processor) Load(path string) (image.Image, error) {
 	}
 
 	// jpeg以外ならピクセルをそのまま返す
-	if format != storage.FormatJpeg {
+	if format != input.FormatJPEG {
 		return i, nil
 	}
 
@@ -132,13 +133,14 @@ func orient(r io.Reader, i image.Image) (image.Image, error) {
 
 // Process はリサイズ処理を行い、エンコードしたデータを返します。
 func (self *Processor) Resize(i image.Image, w io.Writer, f storage.Image) (*image.Point, error) {
+	fmt.Printf("%+v\n", f)
 	var ir image.Image
 	switch f.ValidatedMethod {
 	default:
 		return nil, fmt.Errorf("Unsupported method: %s", f.ValidatedMethod)
-	case storage.MethodNormal:
+	case input.MethodNormal:
 		ir = resize.Resize(uint(f.DestWidth), uint(f.DestHeight), i, resize.Lanczos3)
-	case storage.MethodThumbnail:
+	case input.MethodThumbnail:
 		cr := image.Rect(0, 0, f.CanvasWidth, f.CanvasHeight)
 		src := resize.Resize(uint(f.DestWidth), uint(f.DestHeight), i, resize.Lanczos3)
 		dst := image.NewRGBA(cr)
@@ -149,16 +151,16 @@ func (self *Processor) Resize(i image.Image, w io.Writer, f storage.Image) (*ima
 	switch f.ValidatedFormat {
 	default:
 		return nil, fmt.Errorf("Unsupported format: %s", f.ValidatedFormat)
-	case storage.FormatJpeg:
+	case input.FormatJPEG:
 		if err := jpeg.Encode(w, ir, &jpeg.Options{int(f.ValidatedQuality)}); err != nil {
 			return nil, err
 		}
-	case storage.FormatPng:
+	case input.FormatPNG:
 		e := png.Encoder{CompressionLevel: png.DefaultCompression}
 		if err := e.Encode(w, ir); err != nil {
 			return nil, err
 		}
-	case storage.FormatGif:
+	case input.FormatGIF:
 		if err := gif.Encode(w, ir, &gif.Options{NumColors: 256}); err != nil {
 			return nil, err
 		}

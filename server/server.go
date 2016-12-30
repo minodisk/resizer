@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/md5"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -13,7 +12,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/alecthomas/template"
 	"github.com/go-microservices/resizer/fetcher"
+	"github.com/go-microservices/resizer/input"
 	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/processor"
 	"github.com/go-microservices/resizer/storage"
@@ -23,7 +24,20 @@ import (
 )
 
 const (
-	addr = ":3000"
+	addr      = ":3000"
+	errorHTML = `<!Doctype html>
+<html>
+<head>
+  <title>{{ .StatusCode }} {{ .StatusText }}</title>
+</head>
+<body>
+  <h1>{{ .StatusText }}</h1>
+  <p>{{ .Message }}</p>
+  <hr>
+  <address>{{ .AppName }}/{{ .AppVersion }}</address>
+</body>
+</html>
+`
 )
 
 var (
@@ -32,7 +46,34 @@ var (
 		"png":  "image/png",
 		"gif":  "image/gif",
 	}
+	errorHTMLTemplate *template.Template
 )
+
+type ErrorHTML struct {
+	StatusCode int
+	StatusText string
+	Message    string
+	AppName    string
+	AppVersion string
+}
+
+func NewErrorHTML(code int, message string) ErrorHTML {
+	return ErrorHTML{
+		StatusCode: code,
+		StatusText: http.StatusText(code),
+		Message:    message,
+		AppName:    "resizer",
+		AppVersion: "0.0.1",
+	}
+}
+
+func init() {
+	var err error
+	errorHTMLTemplate, err = template.New("error").Parse(errorHTML)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func Start() error {
 	o, err := option.New(os.Args[1:])
@@ -52,7 +93,7 @@ func Start() error {
 	if err != nil {
 		return err
 	}
-	if err := s.Serve(netutil.LimitListener(l, o.MaxConn)); err != nil {
+	if err := s.Serve(netutil.LimitListener(l, o.MaxHTTPConnections)); err != nil {
 		return errors.Wrap(err, "fail to serve")
 	}
 	return nil
@@ -73,7 +114,7 @@ func NewHandler(o option.Options) (Handler, error) {
 	if err != nil {
 		return Handler{}, err
 	}
-	h := o.Hosts
+	h := o.AllowedHosts
 	return Handler{s, u, h}, nil
 }
 
@@ -82,20 +123,20 @@ func (h *Handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	if req.URL.Path != "/" {
 		resp.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(resp, "Not Found")
-		log.Println("not found")
+		log.Printf("'%s' not found", req.URL.Path)
 		return
 	}
 
 	if err := h.operate(resp, req); err != nil {
-		log.Println("fail to operate: error=%v", err)
+		log.Println(errors.Wrap(err, "fail to operate"))
 		resp.WriteHeader(http.StatusBadRequest)
-		enc := json.NewEncoder(resp)
-		obj := map[string]string{
-			"message": err.Error(),
+
+		e := NewErrorHTML(http.StatusBadRequest, errors.Cause(err).Error())
+		err := errorHTMLTemplate.Execute(resp, e)
+		if err != nil {
+			log.Println(errors.Wrap(err, "fail to generate error html from template"))
 		}
-		if err := enc.Encode(obj); err != nil {
-			log.Println("fail to encode error message to JSON: error=%v", err)
-		}
+
 		return
 	}
 
@@ -106,7 +147,7 @@ func (h *Handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 // エラーを画一的に扱うためにメソッドとして切り分けを行っている
 func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 	// 1. URLクエリからリクエストされているオプションを抽出する
-	input, err := storage.NewInput(req.URL.Query())
+	input, err := input.New(req.URL.Query())
 	if err != nil {
 		return err
 	}

@@ -36,12 +36,9 @@ func TestMain(m *testing.M) {
 	}
 
 	h, err := server.NewHandler(option.Options{
-		DBUser:     "root",
-		DBProtocol: "tcp",
-		DBAddress:  "mysql:3306",
-		DBName:     "resizer",
-		JSON:       "/secret/gcloud.json",
-		Hosts:      []string{u.Host},
+		GCServiceAccount:    "/secret/gcloud.json",
+		MysqlDataSourceName: "root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True",
+		AllowedHosts:        []string{u.Host},
 	})
 	if err != nil {
 		panic(err)
