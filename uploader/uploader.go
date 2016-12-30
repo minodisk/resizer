@@ -28,12 +28,12 @@ type Uploader struct {
 // New はアップローダーを作成する。
 func New(o option.Options) (*Uploader, error) {
 	ctx := context.Background()
-	client, err := gcs.NewClient(ctx, opt.WithScopes(gcs.ScopeFullControl), opt.WithServiceAccountFile(o.JSON))
+	client, err := gcs.NewClient(ctx, opt.WithScopes(gcs.ScopeFullControl), opt.WithServiceAccountFile(o.GCServiceAccount))
 	if err != nil {
 		return nil, errors.Wrap(err, "can't create client for GCS")
 	}
-	bkt := client.Bucket(o.Bucket)
-	return &Uploader{ctx, bkt, o.Bucket}, nil
+	bkt := client.Bucket(o.GCStorageBucket)
+	return &Uploader{ctx, bkt, o.GCStorageBucket}, nil
 }
 
 func (u *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error) {
