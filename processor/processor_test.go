@@ -6,6 +6,7 @@ import (
 	"math"
 	"testing"
 
+	"github.com/go-microservices/resizer/input"
 	"github.com/go-microservices/resizer/processor"
 	"github.com/go-microservices/resizer/storage"
 )
@@ -144,9 +145,9 @@ func TestFormats(t *testing.T) {
 		0, 1, 0, 0, 0,
 		0, 0, 0, 0, 0,
 	}
-	for _, format := range []string{storage.FormatPng, storage.FormatJpeg, storage.FormatGif} {
+	for _, format := range []string{input.FormatPNG, input.FormatJPEG, input.FormatGIF} {
 		f := storage.Image{
-			ValidatedMethod:  storage.MethodNormal,
+			ValidatedMethod:  input.MethodNormal,
 			ValidatedWidth:   5,
 			ValidatedHeight:  7,
 			ValidatedFormat:  format,
@@ -160,10 +161,10 @@ func TestFormats(t *testing.T) {
 
 func TestOrientations(t *testing.T) {
 	f := storage.Image{
-		ValidatedMethod: storage.MethodNormal,
+		ValidatedMethod: input.MethodNormal,
 		ValidatedWidth:  5,
 		ValidatedHeight: 7,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}
 	size := image.Point{5, 7}
 	colors := []int{
@@ -192,25 +193,25 @@ func TestFormatNormal(t *testing.T) {
 		0, 0, 0, 0, 0,
 	}
 	eval(t, png, storage.Image{
-		ValidatedMethod: storage.MethodNormal,
+		ValidatedMethod: input.MethodNormal,
 		ValidatedWidth:  5,
 		ValidatedHeight: 100,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}, size, colors)
 	eval(t, png, storage.Image{
-		ValidatedMethod: storage.MethodNormal,
+		ValidatedMethod: input.MethodNormal,
 		ValidatedWidth:  100,
 		ValidatedHeight: 7,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}, size, colors)
 }
 
 func TestFormatThumbnail(t *testing.T) {
 	eval(t, png, storage.Image{
-		ValidatedMethod: storage.MethodThumbnail,
+		ValidatedMethod: input.MethodThumbnail,
 		ValidatedWidth:  3,
 		ValidatedHeight: 7,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}, image.Point{3, 7}, []int{
 		0, 0, 0,
 		1, 1, 1,
@@ -222,10 +223,10 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: storage.MethodThumbnail,
+		ValidatedMethod: input.MethodThumbnail,
 		ValidatedWidth:  5,
 		ValidatedHeight: 3,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}, image.Point{5, 3}, []int{
 		0, 1, 0, 0, 0,
 		0, 1, 1, 1, 0,
@@ -233,10 +234,10 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: storage.MethodThumbnail,
+		ValidatedMethod: input.MethodThumbnail,
 		ValidatedWidth:  100,
 		ValidatedHeight: 100,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}, image.Point{10, 14}, []int{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -255,10 +256,10 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: storage.MethodThumbnail,
+		ValidatedMethod: input.MethodThumbnail,
 		ValidatedWidth:  6,
 		ValidatedHeight: 100,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}, image.Point{6, 14}, []int{
 		0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0,
@@ -277,10 +278,10 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: storage.MethodThumbnail,
+		ValidatedMethod: input.MethodThumbnail,
 		ValidatedWidth:  2,
 		ValidatedHeight: 100,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}, image.Point{2, 14}, []int{
 		0, 0,
 		0, 0,
@@ -299,10 +300,10 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: storage.MethodThumbnail,
+		ValidatedMethod: input.MethodThumbnail,
 		ValidatedWidth:  100,
 		ValidatedHeight: 10,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}, image.Point{10, 10}, []int{
 		0, 0, 1, 1, 1, 1, 1, 1, 0, 0,
 		0, 0, 1, 1, 1, 1, 1, 1, 0, 0,
@@ -317,10 +318,10 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: storage.MethodThumbnail,
+		ValidatedMethod: input.MethodThumbnail,
 		ValidatedWidth:  100,
 		ValidatedHeight: 6,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}, image.Point{10, 6}, []int{
 		0, 0, 1, 1, 0, 0, 0, 0, 0, 0,
 		0, 0, 1, 1, 0, 0, 0, 0, 0, 0,
@@ -331,10 +332,10 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: storage.MethodThumbnail,
+		ValidatedMethod: input.MethodThumbnail,
 		ValidatedWidth:  100,
 		ValidatedHeight: 2,
-		ValidatedFormat: storage.FormatPng,
+		ValidatedFormat: input.FormatPNG,
 	}, image.Point{10, 2}, []int{
 		0, 0, 1, 1, 1, 1, 1, 1, 0, 0,
 		0, 0, 1, 1, 1, 1, 1, 1, 0, 0,

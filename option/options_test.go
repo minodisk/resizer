@@ -24,11 +24,11 @@ func TestFlags(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if o.ProjectID != "AAAA" {
-		t.Error("wrong ProjectID:", o.ProjectID)
+	if o.GCProjectID != "AAAA" {
+		t.Error("wrong ProjectID:", o.GCProjectID)
 	}
-	if o.Bucket != "BBBB" {
-		t.Error("wrong Bucket:", o.Bucket)
+	if o.GCStorageBucket != "BBBB" {
+		t.Error("wrong Bucket:", o.GCStorageBucket)
 	}
 	if o.JSON != "CCCC" {
 		t.Error("wrong JSON:", o.JSON)
@@ -48,11 +48,11 @@ func TestFlags(t *testing.T) {
 	if o.DBName != "HHHH" {
 		t.Error("wrong DBName:", o.DBName)
 	}
-	if o.Hosts[0] != "IIII" {
-		t.Error("wrong Hosts[0]:", o.Hosts[0])
+	if o.AllowedHosts[0] != "IIII" {
+		t.Error("wrong Hosts[0]:", o.AllowedHosts[0])
 	}
-	if o.Hosts[1] != "JJJJ" {
-		t.Error("wrong Hosts[1]:", o.Hosts[0])
+	if o.AllowedHosts[1] != "JJJJ" {
+		t.Error("wrong Hosts[1]:", o.AllowedHosts[0])
 	}
 }
 
@@ -76,11 +76,11 @@ func TestEnvar(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if o.ProjectID != os.Getenv("RESIZER_PROJECT_ID") {
-		t.Error("wrong ProjectID:", o.ProjectID)
+	if o.GCProjectID != os.Getenv("RESIZER_PROJECT_ID") {
+		t.Error("wrong ProjectID:", o.GCProjectID)
 	}
-	if o.Bucket != os.Getenv("RESIZER_BUCKET") {
-		t.Error("wrong Bucket:", o.Bucket)
+	if o.GCStorageBucket != os.Getenv("RESIZER_BUCKET") {
+		t.Error("wrong Bucket:", o.GCStorageBucket)
 	}
 	if o.JSON != os.Getenv("RESIZER_JSON") {
 		t.Error("wrong JSON:", o.JSON)
@@ -101,7 +101,7 @@ func TestEnvar(t *testing.T) {
 		t.Error("wrong DBName:", o.DBName)
 	}
 	SplitedHosts := strings.Split(os.Getenv("RESIZER_HOSTS"), ",")
-	if o.Hosts[0] != SplitedHosts[0] {
-		t.Error("wrong Hosts:", o.Hosts, "expect:", SplitedHosts)
+	if o.AllowedHosts[0] != SplitedHosts[0] {
+		t.Error("wrong Hosts:", o.AllowedHosts, "expect:", SplitedHosts)
 	}
 }

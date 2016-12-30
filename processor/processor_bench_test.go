@@ -3,6 +3,7 @@ package processor_test
 import (
 	"testing"
 
+	"github.com/go-microservices/resizer/input"
 	"github.com/go-microservices/resizer/processor"
 	"github.com/go-microservices/resizer/storage"
 )
@@ -62,7 +63,7 @@ func BenchmarkSmall(b *testing.B) {
 
 func process(path string) error {
 	p := processor.New()
-	i, err := storage.NewImage(storage.Input{
+	i, err := storage.NewImage(input.Input{
 		URL:   "http://example.com/test.jpg",
 		Width: 800,
 	})
