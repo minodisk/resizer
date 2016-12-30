@@ -10,6 +10,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/go-microservices/resizer/input"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -36,7 +37,7 @@ type Image struct {
 
 // New はクエリのマップ q から File を作成する。
 // デフォルト値の存在するパラメーターに値が設定されていない場合は、デフォルト値を設定する。
-func NewImage(input Input) (Image, error) {
+func NewImage(input input.Input) (Image, error) {
 	return Image{
 		ValidatedURL:     input.URL,
 		ValidatedMethod:  input.Method,
@@ -124,7 +125,7 @@ func (i Image) normalize(src image.Point) (Image, error) {
 	default:
 		return i, fmt.Errorf("method %s isn't supported", i.ValidatedMethod)
 	// 目的のサイズに完全に収まる大きさを計算する
-	case MethodNormal:
+	case input.MethodNormal:
 		dr := dx / dy
 		if dr == sr {
 			i.DestWidth = i.ValidatedWidth
@@ -147,7 +148,7 @@ func (i Image) normalize(src image.Point) (Image, error) {
 		}
 	// 目的のサイズを埋める大きさを計算する
 	// 最終的なサイズが目的のサイズをはみだしてもよい
-	case MethodThumbnail:
+	case input.MethodThumbnail:
 		rx := math.Min(1, dx/sx)
 		ry := math.Min(1, dy/sy)
 		if rx > ry {

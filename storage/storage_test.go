@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/go-microservices/resizer/input"
 	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/storage"
 )
@@ -27,8 +28,8 @@ func TestCache(t *testing.T) {
 		ValidatedURL:     "http://example.com/foo.jpg",
 		ValidatedWidth:   400,
 		ValidatedHeight:  300,
-		ValidatedMethod:  storage.MethodDefault,
-		ValidatedFormat:  storage.FormatDefault,
+		ValidatedMethod:  input.MethodDefault,
+		ValidatedFormat:  input.FormatDefault,
 		ValidatedQuality: 100,
 	}
 	s.NewRecord(file)

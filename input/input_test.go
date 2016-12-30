@@ -1,19 +1,19 @@
-package storage_test
+package input_test
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/go-microservices/resizer/storage"
+	"github.com/go-microservices/resizer/input"
 )
 
 func TestValidateURL(t *testing.T) {
 	type Input struct {
-		Input storage.Input
+		Input input.Input
 		Hosts []string
 	}
 	type Expected struct {
-		Input storage.Input
+		Input input.Input
 		Error error
 	}
 	type Case struct {
@@ -26,7 +26,7 @@ func TestValidateURL(t *testing.T) {
 		{
 			Spec: "allow http",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://example.com",
 				},
 				Hosts: []string{
@@ -34,7 +34,7 @@ func TestValidateURL(t *testing.T) {
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://example.com",
 				},
 				Error: nil,
@@ -43,7 +43,7 @@ func TestValidateURL(t *testing.T) {
 		{
 			Spec: "allow https",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "https://foo.example.com",
 				},
 				Hosts: []string{
@@ -52,7 +52,7 @@ func TestValidateURL(t *testing.T) {
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "https://foo.example.com",
 				},
 				Error: nil,
@@ -61,7 +61,7 @@ func TestValidateURL(t *testing.T) {
 		{
 			Spec: "not allow any other scheme",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "ftp://example.com",
 				},
 				Hosts: []string{
@@ -69,16 +69,16 @@ func TestValidateURL(t *testing.T) {
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "ftp://example.com",
 				},
-				Error: storage.NewInvalidSchemeError("ftp"),
+				Error: input.NewInvalidSchemeError("ftp"),
 			},
 		},
 		{
 			Spec: "not allow unspecified hosts",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://foo.example.com",
 				},
 				Hosts: []string{
@@ -86,16 +86,16 @@ func TestValidateURL(t *testing.T) {
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://foo.example.com",
 				},
-				Error: storage.NewInvalidHostError("foo.example.com"),
+				Error: input.NewInvalidHostError("foo.example.com"),
 			},
 		},
 		{
 			Spec: "Can specify multi-hosts",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://foo.example.com",
 				},
 				Hosts: []string{
@@ -104,7 +104,7 @@ func TestValidateURL(t *testing.T) {
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://foo.example.com",
 				},
 				Error: nil,
@@ -113,7 +113,7 @@ func TestValidateURL(t *testing.T) {
 		{
 			Spec: "allow port 80",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://example.com:80",
 				},
 				Hosts: []string{
@@ -121,7 +121,7 @@ func TestValidateURL(t *testing.T) {
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://example.com:80",
 				},
 				Error: nil,
@@ -130,7 +130,7 @@ func TestValidateURL(t *testing.T) {
 		{
 			Spec: "not allow any other port",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://example.com:8080",
 				},
 				Hosts: []string{
@@ -138,16 +138,16 @@ func TestValidateURL(t *testing.T) {
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://example.com:8080",
 				},
-				Error: storage.NewInvalidHostError("example.com:8080"),
+				Error: input.NewInvalidHostError("example.com:8080"),
 			},
 		},
 		{
 			Spec: "Can specify host with port",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://example.com:8080",
 				},
 				Hosts: []string{
@@ -155,7 +155,7 @@ func TestValidateURL(t *testing.T) {
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					URL: "http://example.com:8080",
 				},
 				Error: nil,
@@ -176,10 +176,10 @@ func TestValidateURL(t *testing.T) {
 
 func TestValidateSize(t *testing.T) {
 	type Input struct {
-		Input storage.Input
+		Input input.Input
 	}
 	type Expected struct {
-		Input storage.Input
+		Input input.Input
 		Error error
 	}
 	type Case struct {
@@ -192,13 +192,13 @@ func TestValidateSize(t *testing.T) {
 		{
 			Spec: "allow positive size",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					Width:  100,
 					Height: 200,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					Width:  100,
 					Height: 200,
 				},
@@ -208,13 +208,13 @@ func TestValidateSize(t *testing.T) {
 		{
 			Spec: "allow zero width and positive height",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					Width:  0,
 					Height: 200,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					Width:  0,
 					Height: 200,
 				},
@@ -224,13 +224,13 @@ func TestValidateSize(t *testing.T) {
 		{
 			Spec: "allow positive width and zero height",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					Width:  100,
 					Height: 0,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					Width:  100,
 					Height: 0,
 				},
@@ -240,33 +240,33 @@ func TestValidateSize(t *testing.T) {
 		{
 			Spec: "not allow negative width",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					Width:  -100,
 					Height: 200,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					Width:  -100,
 					Height: 200,
 				},
-				Error: storage.NewInvalidSizeError(-100, 200),
+				Error: input.NewInvalidSizeError(-100, 200),
 			},
 		},
 		{
 			Spec: "not allow negative height",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					Width:  100,
 					Height: -200,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					Width:  100,
 					Height: -200,
 				},
-				Error: storage.NewInvalidSizeError(100, -200),
+				Error: input.NewInvalidSizeError(100, -200),
 			},
 		},
 	}
@@ -284,10 +284,10 @@ func TestValidateSize(t *testing.T) {
 
 func TestValidateMethod(t *testing.T) {
 	type Input struct {
-		Input storage.Input
+		Input input.Input
 	}
 	type Expected struct {
-		Input storage.Input
+		Input input.Input
 		Error error
 	}
 	type Case struct {
@@ -300,13 +300,13 @@ func TestValidateMethod(t *testing.T) {
 		{
 			Spec: "allow normal method",
 			Input: Input{
-				Input: storage.Input{
-					Method: storage.MethodNormal,
+				Input: input.Input{
+					Method: input.MethodNormal,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
-					Method: storage.MethodNormal,
+				Input: input.Input{
+					Method: input.MethodNormal,
 				},
 				Error: nil,
 			},
@@ -314,13 +314,13 @@ func TestValidateMethod(t *testing.T) {
 		{
 			Spec: "allow thumbnail method",
 			Input: Input{
-				Input: storage.Input{
-					Method: storage.MethodThumbnail,
+				Input: input.Input{
+					Method: input.MethodThumbnail,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
-					Method: storage.MethodThumbnail,
+				Input: input.Input{
+					Method: input.MethodThumbnail,
 				},
 				Error: nil,
 			},
@@ -328,15 +328,15 @@ func TestValidateMethod(t *testing.T) {
 		{
 			Spec: "not allow any other method",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					Method: "foo",
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					Method: "foo",
 				},
-				Error: storage.NewInvalidMethodError("foo"),
+				Error: input.NewInvalidMethodError("foo"),
 			},
 		},
 	}
@@ -354,10 +354,10 @@ func TestValidateMethod(t *testing.T) {
 
 func TestValidateFormatAndQuality(t *testing.T) {
 	type Input struct {
-		Input storage.Input
+		Input input.Input
 	}
 	type Expected struct {
-		Input storage.Input
+		Input input.Input
 		Error error
 	}
 	type Case struct {
@@ -370,13 +370,13 @@ func TestValidateFormatAndQuality(t *testing.T) {
 		{
 			Spec: "fill empty format with jpeg",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					Format: "",
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
-					Format: storage.FormatJpeg,
+				Input: input.Input{
+					Format: input.FormatJPEG,
 				},
 				Error: nil,
 			},
@@ -384,13 +384,13 @@ func TestValidateFormatAndQuality(t *testing.T) {
 		{
 			Spec: "allow jpeg format",
 			Input: Input{
-				Input: storage.Input{
-					Format: storage.FormatJpeg,
+				Input: input.Input{
+					Format: input.FormatJPEG,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
-					Format: storage.FormatJpeg,
+				Input: input.Input{
+					Format: input.FormatJPEG,
 				},
 				Error: nil,
 			},
@@ -398,13 +398,13 @@ func TestValidateFormatAndQuality(t *testing.T) {
 		{
 			Spec: "allow png format",
 			Input: Input{
-				Input: storage.Input{
-					Format: storage.FormatPng,
+				Input: input.Input{
+					Format: input.FormatPNG,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
-					Format: storage.FormatPng,
+				Input: input.Input{
+					Format: input.FormatPNG,
 				},
 				Error: nil,
 			},
@@ -412,13 +412,13 @@ func TestValidateFormatAndQuality(t *testing.T) {
 		{
 			Spec: "allow gif format",
 			Input: Input{
-				Input: storage.Input{
-					Format: storage.FormatGif,
+				Input: input.Input{
+					Format: input.FormatGIF,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
-					Format: storage.FormatGif,
+				Input: input.Input{
+					Format: input.FormatGIF,
 				},
 				Error: nil,
 			},
@@ -426,60 +426,60 @@ func TestValidateFormatAndQuality(t *testing.T) {
 		{
 			Spec: "not allow any other format",
 			Input: Input{
-				Input: storage.Input{
+				Input: input.Input{
 					Format: "foo",
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
+				Input: input.Input{
 					Format: "foo",
 				},
-				Error: storage.NewInvalidFormatError("foo"),
+				Error: input.NewInvalidFormatError("foo"),
 			},
 		},
 		{
 			Spec: "not allow negative quality",
 			Input: Input{
-				Input: storage.Input{
-					Format:  storage.FormatJpeg,
+				Input: input.Input{
+					Format:  input.FormatJPEG,
 					Quality: -1,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
-					Format:  storage.FormatJpeg,
+				Input: input.Input{
+					Format:  input.FormatJPEG,
 					Quality: -1,
 				},
-				Error: storage.NewInvalidQualityError(-1),
+				Error: input.NewInvalidQualityError(-1),
 			},
 		},
 		{
 			Spec: "not allow over 100 quality",
 			Input: Input{
-				Input: storage.Input{
-					Format:  storage.FormatJpeg,
+				Input: input.Input{
+					Format:  input.FormatJPEG,
 					Quality: 101,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
-					Format:  storage.FormatJpeg,
+				Input: input.Input{
+					Format:  input.FormatJPEG,
 					Quality: 101,
 				},
-				Error: storage.NewInvalidQualityError(101),
+				Error: input.NewInvalidQualityError(101),
 			},
 		},
 		{
 			Spec: "fill quality as 0 with any other format",
 			Input: Input{
-				Input: storage.Input{
-					Format:  storage.FormatPng,
+				Input: input.Input{
+					Format:  input.FormatPNG,
 					Quality: 80,
 				},
 			},
 			Expected: Expected{
-				Input: storage.Input{
-					Format:  storage.FormatPng,
+				Input: input.Input{
+					Format:  input.FormatPNG,
 					Quality: 0,
 				},
 				Error: nil,

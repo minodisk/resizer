@@ -1,4 +1,4 @@
-package storage
+package input
 
 import (
 	"fmt"
@@ -19,10 +19,10 @@ const (
 	MethodThumbnail = "thumbnail"
 	MethodDefault   = MethodNormal
 
-	FormatJpeg    = "jpeg"
-	FormatPng     = "png"
-	FormatGif     = "gif"
-	FormatDefault = FormatJpeg
+	FormatJPEG    = "jpeg"
+	FormatPNG     = "png"
+	FormatGIF     = "gif"
+	FormatDefault = FormatJPEG
 
 	QualityMax     = 100
 	QualityMin     = 0
@@ -45,7 +45,7 @@ type Input struct {
 	Quality int
 }
 
-func NewInput(q map[string][]string) (Input, error) {
+func New(q map[string][]string) (Input, error) {
 	var o Input
 	if len(q[KeyURL]) != 0 {
 		o.URL = q[KeyURL][0]
@@ -71,13 +71,13 @@ func NewInput(q map[string][]string) (Input, error) {
 		o.Format = q[KeyFormat][0]
 	}
 	if len(q[KeyQuality]) != 0 {
-		// q, err := strconv.ParseUint(q[KeyQuality][0], 10, 8)
-		q, err := strconv.Atoi(q[KeyQuality][0])
+		var err error
+		o.Quality, err = strconv.Atoi(q[KeyQuality][0])
 		if err != nil {
 			return o, err
 		}
-		o.Quality = q
-		// o.Quality = uint8(q)
+	} else {
+		o.Quality = 100
 	}
 	return o, nil
 }
@@ -149,12 +149,12 @@ func (i Input) ValidateFormatAndQuality() (Input, error) {
 	switch i.Format {
 	case "":
 		i.Format = FormatDefault
-	case FormatJpeg, FormatPng, FormatGif:
+	case FormatJPEG, FormatPNG, FormatGIF:
 	default:
 		return i, NewInvalidFormatError(i.Format)
 	}
 	switch i.Format {
-	case FormatJpeg:
+	case FormatJPEG:
 		if i.Quality < QualityMin || QualityMax < i.Quality {
 			return i, NewInvalidQualityError(i.Quality)
 		}
