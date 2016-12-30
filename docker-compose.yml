@@ -6,21 +6,28 @@ services:
     build:
       context: .
     environment:
-      RESIZER_PROJECT_ID: syoya-tests
-      RESIZER_BUCKET: resizer
-      RESIZER_JSON: /secret/gcloud.json
-      RESIZER_DB_USER: root
-      RESIZER_DB_PROTOCOL: tcp
-      RESIZER_DB_ADDRESS: mysql:3306
-      RESIZER_DB_NAME: resizer
-      # RESIZER_HOSTS: $RESIZER_HOSTS
+      # RESIZER_PROJECT_ID: syoya-tests
+      # RESIZER_BUCKET: resizer
+      # RESIZER_JSON: /secret/gcloud.json
+      # RESIZER_DB_USER: root
+      # RESIZER_DB_PROTOCOL: tcp
+      # RESIZER_DB_ADDRESS: mysql:3306
+      # RESIZER_DB_NAME: resizer
+      ENVIRONMENT: development
+      GC_PROJECT_ID: syoya-tests
+      GC_STORAGE_BUCKET: resizer
+      GC_SERVICE_ACCOUNT: /secret/gcloud.json
+      MYSQL_DATA_SOURCE_NAME: root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True
+      ALLOWED_HOSTS: c6.staticflickr.com,c3.staticflickr.com
+      MAX_HTTP_CONNECTIONS: 10
     volumes:
-      # - .:/go/src/github.com/go-microservices/resizer
       - ./secret:/secret
+      - .:/go/src/github.com/go-microservices/resizer
     depends_on:
       - mysql
     ports:
-      - 80:3000
+      - 80:3001
+    command: sh -c "gin --immediate --port 3001 --appPort 3000 run"
 
   mysql:
     image: mysql:5.6
