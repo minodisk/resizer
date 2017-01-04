@@ -1,6 +1,8 @@
 #!/bin/bash
 
-docker run -it \
-  -v $(pwd):/go/src/github.com/go-microservices/resizer \
-  -u $(id -u):$(id -g) \
-  resizer_app glide $@
+export USER=$(id -u):$(id -g)
+
+docker-compose \
+  -f docker-compose.yml \
+  -f docker-compose.glide.yml \
+  run app sh -c "glide $@"
