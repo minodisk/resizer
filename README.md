@@ -1,126 +1,96 @@
 # resizer
 
-## Keywords
+## Specification
 
-- リサイズ: 回転やスケールなど、このアプリケーションで行う一連の画像処理全体のこと。
-- スケール: 拡大縮小処理。
-- アスペクト比: `width/height`。
+- Keeps aspect ratio.
+- Doesn't scale up, but scale down.
+- Reflect orientation tag in EXIF of JPEG to pixels of resized image.
+- Drops meta data.
 
-## 仕様
+## Installation
 
-- 目的のサイズと同じか小さなサイズにリサイズする。
-  - リサイズ後の画像が目的のサイズと同サイズである保証はない。
-- 元画像を縦横同じ比率で1倍以下にスケールする。
-  - リサイズ後の画像が一方向に潰れることはない。
-  - 拡大することはない。
-- スケール後に再エンコードを行うので元画像のメタ情報は引き継がれない。
-  - 元画像がjpegで且つEXIFにOrientationタグが存在する場合、画像情報に回転を反映してからスケール処理を行う。
+Download binary for your environment from [latest release](https://github.com/go-microservices/resizer/releases/latest), or `go get` like:
 
-## API
+```bash
+go get -u github.com/go-microservices/resizer/...
+```
 
-### エンドポイント
+## Usage
+
+```bash
+./resizer
+```
+
+### Environment variables
+
+- `ENVIRONMENT`: `development` or `production`. In default `production`
+- `GC_PROJECT_ID`: The project ID of Google Cloud.
+- `GC_STORAGE_BUCKET`: The bucket name of Google Cloud Storage.
+- `GC_SERVICE_ACCOUNT`: The base64-encoded service account JSON of Google Cloud.
+- `MYSQL_DATA_SOURCE_NAME`: The data source name of MySQL.
+- `ALLOWED_HOSTS`: The allowed hosts of resizing images. Specified with a string joined by `,`. When unspecified, resizer will resize images in any host.
+- `MAX_HTTP_CONNECTIONS`
+
+## HTTP(S) API
+
+### Examples
+
+```http:HTTPRequest
+curl http://your.host.name/?url=http%3A%2F%2Fexample.com%2Fimage.jpeg&width=800
+```
+
+### Endpoint
 
 ```http:Endpoint
 GET http://your.host.name/
 ```
 
-### リクエスト
+### Parameters
 
-- 値に`&`等の記号が入っている場合はURLエンコードする必要がある。
-  - 予め値が判明していて`&`等の記号が含まれていない場合はURLエンコードする必要がない。
-  - 値がユーザー入力で決定する等、予測不可能な場合は必ずURLエンコードするべき。
-- オプショナルなパラメータは設定されていなければデフォルト値を自動的に設定する。
-- パラメータに値が設定されていて、且つ適切でない値が設定された場合はエラーとなる。
+- Joint `key=value` parameters with `&`.
+  - The `value` should be URL-encoded.
 
-#### url
+#### `url`
 
-画像のURL。必須。
+The URL of a resizing image. Required.
+The host of the URL should be specified with `hosts` in running option.
 
-- 特定のホストしているサービスのホスト名でなければならない。
+#### `width`, `height`
 
-#### width, height
+The size of resized image in pixel. In default `0`.
 
-幅と高さ。単位px。`0`〜。オプショナル(最低でも width, height のどちらか1つは指定する必要がある)。デフォルト`0`。
+- An integer greater than or equal to `0`.
+- Specify `0` to both of `width` and `height` isn't allowed.
+- When `width` is `0`. `width` is guessed with `height` and the aspect ratio of the source image .
+- When `height` is `0`. `height` is guessed with `width` and the aspect ratio of the source image .
+- The specified size is greater than the size of source image, resizer doesn't resize.
 
-- 「`0`以上の整数値」以外の値は許可しない。
-- 共に`0`は許可しない。
-- *width*だけが`0`なら*height*と元画像のアスペクト比から*width*を算出して設定する。
-- *height*だけが`0`なら*width*と元画像のアスペクト比から*height*を算出して設定する。
-- 元画像のサイズより大きければ無視し、元画像のサイズを採用する。
+#### `method`
 
-#### method
+How to resize. `normal` or `thumbnail`. Optional. In default `normal`.
 
-リサイズ方法。`normal`|`thumbnail`。オプショナル。デフォルト`normal`。
+- When `width` or `height` is `0`, specified `method` is ignored and resizer resizes `normal`.
+  - `width` and `height` shouldn't be specified with `0`, when method is `thumbnail`.
+- When specifies `normal`, resizer resizes image to fall into the specified size and doesn't clip.
+- When specifies `thumbnail`, resizer resizes image to fill all pixels in the specified size and clips the outer of the specified size.
 
-- *width*または*height*のどちらかが`0`なら無視する。
-- 選択肢以外の値は許可しない。
-- `normal`の場合、必ず目的のサイズに収まるように画像をスケールする。画像の一部を切り取ることはない。
-- `thumbnail`の場合、なるべく目的のサイズの全ピクセルを塗るように画像をスケールする。目的サイズの外側を切り取り、内側を結果とする。
+#### `format`
 
-#### format
+The format of the resized image. `jpeg` or `png` or `gif`. In default `jpeg`.
 
-フォーマット。`jpeg`|`png`|`gif`。オプショナル。デフォルト`jpeg`。
+#### `quality`
 
-- 選択肢以外の値は許可しない。
+The quality of the resized image as `jpeg`. `0`〜`100`. In default `100`.
 
-#### quality
+- Ignored, when `format` isn't `jpeg`.
 
-jpegのクオリティ。`1`〜`100`。オプショナル。デフォルト`100`。
+### Response
 
-- *format*が`jpeg`以外なら無視する。
-- 「`1`〜`100`の整数値」以外の値は許可しない。
+#### Success
 
-### レスポンス
+- When resizes first time, response resized image data with the code as `2xx`.
+- When resizes second (or third or forth) time, response with code as `3xx` and redirects to the storage URL of that the resized image was saved.
 
-#### エラー時
+#### Error
 
-- `4xx`系レスポンスの場合はレスポンスボディに理由の詳細を記載する。
-  - `message`: エラーメッセージです。
-
-#### 正常時
-
-- 同条件のパラメーターでリサイズを行ったことがない場合、リサイズ済の画像データをレスポンスする。
-- 同条件のパラメーターでリサイズを行ったことがある場合、S3の画像URLにリダイレクトする。
-
-### 例
-
-リクエスト
-
-```http:HTTPRequest
-GET http://your.host.name/?url=http%3A%2F%2Fexample.com%2Fimage.jpeg&width=800 HTTP/1.1
-Host: your.host.name
-```
-
----
-
-同条件のパラメーターでリサイズを行ったことがない場合のレスポンス
-
-```http:HTTPResponse
-HTTP/1.1 200 OK
-Content-Type: image/jpeg
-```
-
----
-
-同条件のパラメーターでリサイズを行ったことがある場合のレスポンス
-
-```http:HTTPResponse
-HTTP/1.1 303 See Other
-Content-Type: text/html; charset=utf-8
-Location: https://s3-ap-northeast-1.amazonaws.com/your-bucket-name/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxx.jpeg
-```
-
----
-
-エラーした場合
-
-```http:HTTPResponse
-HTTP/1.1 400 Bad Request
-Content-Type: application/json
-
-{"message":"detail of the error"}
-```
-
-## 開発方法
-
-[CONTRIBUTING.md](CONTRIBUTING.md)を参照。
+Response with the code as `4xx`, and the reason will be written in the body.
