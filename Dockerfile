@@ -11,6 +11,7 @@ RUN apk --update add \
 COPY glide.yaml glide.yaml
 COPY glide.lock glide.lock
 RUN glide install
+COPY ./.secret /secret
 COPY . .
 
 CMD go run ./main.go

@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+
+  app:
+    volumes:
+      - ./.secret:/secret
+      - .:/go/src/github.com/go-microservices/resizer
+    ports:
+      - 80:3001
+    command: |-
+      sh -c " \
+        gin \
+          --immediate \
+          --port 3001 \
+          --appPort 3000 \
+          run \
+      "

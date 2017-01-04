@@ -24,9 +24,6 @@ gin-bin
 # secret
 .secret
 
-# Secret Files
-secret
-
 # Compiled File
 resizer
 dist

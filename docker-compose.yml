@@ -13,14 +13,8 @@ services:
       MYSQL_DATA_SOURCE_NAME: root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True
       ALLOWED_HOSTS: c6.staticflickr.com,c3.staticflickr.com
       MAX_HTTP_CONNECTIONS: 10
-    volumes:
-      - ./secret:/secret
-      - .:/go/src/github.com/go-microservices/resizer
     depends_on:
       - mysql
-    ports:
-      - 80:3001
-    command: sh -c "gin --immediate --port 3001 --appPort 3000 run"
 
   mysql:
     image: mysql:5.6
