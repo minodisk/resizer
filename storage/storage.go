@@ -19,7 +19,7 @@ type Storage struct {
 	*gorm.DB
 }
 
-func New(o option.Options) (*Storage, error) {
+func New(o option.Option) (*Storage, error) {
 	db, err := gorm.Open("mysql", o.MysqlDataSourceName)
 	if err != nil {
 		return nil, err

@@ -28,3 +28,5 @@ import:
 - package: google.golang.org/api
   subpackages:
   - storage/v1
+- package: github.com/ghodss/yaml
+- package: gopkg.in/yaml.v2

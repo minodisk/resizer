@@ -1,25 +1,27 @@
-hash: a40bc883f77f98e67c8a10fd605f9d09d5dbf04bbfa12a628b4dcbc743e865e8
-updated: 2016-12-26T15:34:49.11909154Z
+hash: 54518e10335c6e0df904dfe8749abb942dcbaea38d058e9633a0b1186fbc2c4a
+updated: 2017-01-04T06:32:57.798532779Z
 imports:
 - name: cloud.google.com/go
-  version: 3c4c8cc11d151d76587802cb55dd7b80beca832b
+  version: fa261437944009fe81aa841d9976710d5235a3a7
   subpackages:
   - compute/metadata
   - internal
+  - internal/optional
+  - storage
 - name: github.com/alecthomas/kingpin
   version: e9044be3ab2a8e11d4e1f418d12f0790d57e8d70
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
   subpackages:
   - parse
-- name: github.com/alecthomas/units
-  version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
 - name: github.com/BurntSushi/graphics-go
   version: b43f31a4a96688fba0b612e25e22648b9267e498
   subpackages:
   - graphics
   - graphics/convolve
   - graphics/interp
+- name: github.com/ghodss/yaml
+  version: 04f313413ffd65ce25f2541bfd2b2ceec5c0908c
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/golang/protobuf
@@ -31,7 +33,7 @@ imports:
 - name: github.com/jinzhu/gorm
   version: 5174cc5c242a728b435ea2be8a2f7f998e15429b
 - name: github.com/jinzhu/inflection
-  version: 74387dc39a75e970e7a3ae6a3386b5bd2e5c5cff
+  version: 1c35d901db3da928c72a72d8458480cc9ade058f
 - name: github.com/nfnt/resize
   version: 891127d8d1b52734debe1b3c3d7e747502b6c366
 - name: github.com/pkg/errors
@@ -44,7 +46,7 @@ imports:
 - name: github.com/satori/go.uuid
   version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: golang.org/x/net
-  version: 45e771701b814666a7eb299e6c7a57d0b1799e91
+  version: 69d4b8aa71caaaa75c3dfc11211d1be495abec7c
   subpackages:
   - context
   - context/ctxhttp
@@ -68,7 +70,12 @@ imports:
   - gensupport
   - googleapi
   - googleapi/internal/uritemplates
+  - googleapi/transport
+  - internal
+  - iterator
+  - option
   - storage/v1
+  - transport
 - name: google.golang.org/appengine
   version: 08a149cfaee099e6ce4be01c0113a78c85ee1dee
   subpackages:
@@ -79,13 +86,16 @@ imports:
   - internal/log
   - internal/modules
   - internal/remote_api
+  - internal/socket
   - internal/urlfetch
+  - socket
   - urlfetch
 - name: google.golang.org/grpc
-  version: 9d682f9293b408c42d17c587d0e2a31237ac3f10
+  version: c8105071640ef29fce843ed96983e864bb18eb0e
   subpackages:
   - codes
   - credentials
+  - credentials/oauth
   - grpclog
   - internal
   - metadata
@@ -94,4 +104,6 @@ imports:
   - stats
   - tap
   - transport
+- name: gopkg.in/yaml.v2
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 testImports: []

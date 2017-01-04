@@ -1,107 +1,67 @@
 package option_test
 
 import (
-	"os"
-	"strings"
+	"reflect"
 	"testing"
 
 	"github.com/go-microservices/resizer/option"
+	"github.com/pkg/errors"
 )
 
-func TestFlags(t *testing.T) {
-	o, err := option.New([]string{
-		"--id", "AAAA",
-		"--bucket", "BBBB",
-		"--json", "CCCC",
-		"--dbuser", "DDDD",
-		"--dbpassword", "EEEE",
-		"--dbprotocol", "FFFF",
-		"--dbaddress", "GGGG",
-		"--dbname", "HHHH",
-		"--host", "IIII",
-		"--host", "JJJJ",
-	})
+func TestLoad(t *testing.T) {
+	os, err := option.Load("../fixtures/config.yml")
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal(errors.Wrap(err, "fail to load config"))
 	}
-	if o.GCProjectID != "AAAA" {
-		t.Error("wrong ProjectID:", o.GCProjectID)
-	}
-	if o.GCStorageBucket != "BBBB" {
-		t.Error("wrong Bucket:", o.GCStorageBucket)
-	}
-	if o.JSON != "CCCC" {
-		t.Error("wrong JSON:", o.JSON)
-	}
-	if o.DBUser != "DDDD" {
-		t.Error("wrong DBUser:", o.DBUser)
-	}
-	if o.DBPassword != "EEEE" {
-		t.Error("wrong DBPassword:", o.DBPassword)
-	}
-	if o.DBProtocol != "FFFF" {
-		t.Error("wrong DBProtocol:", o.DBProtocol)
-	}
-	if o.DBAddress != "GGGG" {
-		t.Error("wrong DBAddress:", o.DBAddress)
-	}
-	if o.DBName != "HHHH" {
-		t.Error("wrong DBName:", o.DBName)
-	}
-	if o.AllowedHosts[0] != "IIII" {
-		t.Error("wrong Hosts[0]:", o.AllowedHosts[0])
-	}
-	if o.AllowedHosts[1] != "JJJJ" {
-		t.Error("wrong Hosts[1]:", o.AllowedHosts[0])
-	}
-}
 
-func TestEnvar(t *testing.T) {
-	for key, value := range map[string]string{
-		"RESIZER_PROJECT_ID":  "AAAA",
-		"RESIZER_BUCKET":      "BBBB",
-		"RESIZER_JSON":        "CCCC",
-		"RESIZER_DB_USER":     "DDDD",
-		"RESIZER_DB_PASSWORD": "EEEE",
-		"RESIZER_DB_PROTOCOL": "FFFF",
-		"RESIZER_DB_ADDRESS":  "GGGG",
-		"RESIZER_DB_NAME":     "HHHH",
-		"RESIZER_HOSTS":       "IIII,JJJJ",
-	} {
-		if err := os.Setenv(key, value); err != nil {
-			t.Fatal(err)
+	if a, e := len(os), 2; a != e {
+		t.Errorf("the length of options expected %d, but actual %d", e, a)
+	}
+
+	type Case struct {
+		Key    string
+		Option option.NewOption
+	}
+
+	cases := []Case{
+		{
+			Key: "*",
+			Option: option.NewOption{
+				MaxHTTPConnections: 7,
+				GoogleCloud: option.GoogleCloud{
+					ProjectID:         "syoya-test",
+					ServiceAccount:    "/secret/gcloud.json",
+					StorageBucketName: "resizer",
+				},
+				MySQL: option.MySQL{
+					DataSourceName: "root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True",
+				},
+			},
+		},
+		{
+			Key: "foo.bar",
+			Option: option.NewOption{
+				MaxHTTPConnections: 7,
+				GoogleCloud: option.GoogleCloud{
+					ProjectID:         "foo-bar",
+					ServiceAccount:    "/foo/bar.json",
+					StorageBucketName: "foo",
+				},
+				MySQL: option.MySQL{
+					DataSourceName: "foo:bar@tcp(mysql:3306)/baz",
+				},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		o, ok := os[c.Key]
+		if !ok {
+			t.Errorf("the key `%s` expected existing, but actual not")
+			continue
 		}
-	}
-	o, err := option.New([]string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if o.GCProjectID != os.Getenv("RESIZER_PROJECT_ID") {
-		t.Error("wrong ProjectID:", o.GCProjectID)
-	}
-	if o.GCStorageBucket != os.Getenv("RESIZER_BUCKET") {
-		t.Error("wrong Bucket:", o.GCStorageBucket)
-	}
-	if o.JSON != os.Getenv("RESIZER_JSON") {
-		t.Error("wrong JSON:", o.JSON)
-	}
-	if o.DBUser != os.Getenv("RESIZER_DB_USER") {
-		t.Error("wrong DBUser:", o.DBUser)
-	}
-	if o.DBPassword != os.Getenv("RESIZER_DB_PASSWORD") {
-		t.Error("wrong DBPassword:", o.DBPassword)
-	}
-	if o.DBProtocol != os.Getenv("RESIZER_DB_PROTOCOL") {
-		t.Error("wrong DBProtocol:", o.DBProtocol)
-	}
-	if o.DBAddress != os.Getenv("RESIZER_DB_ADDRESS") {
-		t.Error("wrong DBAddress:", o.DBAddress)
-	}
-	if o.DBName != os.Getenv("RESIZER_DB_NAME") {
-		t.Error("wrong DBName:", o.DBName)
-	}
-	SplitedHosts := strings.Split(os.Getenv("RESIZER_HOSTS"), ",")
-	if o.AllowedHosts[0] != SplitedHosts[0] {
-		t.Error("wrong Hosts:", o.AllowedHosts, "expect:", SplitedHosts)
+		if a, e := o, c.Option; !reflect.DeepEqual(a, e) {
+			t.Errorf("option is expected:\n%+v\nbut actual:\n%+v\n", e, a)
+		}
 	}
 }

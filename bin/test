@@ -9,8 +9,7 @@ fi
 docker-compose up -d mysql
 sleep 10
 docker-compose run app go test \
-  ./fetcher/...
-docker-compose run app go test \
+  ./fetcher/... \
   ./option/... \
   ./processor/... \
   ./server/... \
