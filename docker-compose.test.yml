@@ -1,0 +1,17 @@
+version: '2'
+
+services:
+
+  app:
+    command: |-
+      sh -c " \
+        go test \
+          . \
+          ./fetcher/... \
+          ./input/... \
+          ./option/... \
+          ./processor/... \
+          ./server/... \
+          ./storage/... \
+          ./uploader/... \
+      "

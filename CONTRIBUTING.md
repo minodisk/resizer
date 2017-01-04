@@ -1,98 +1,31 @@
 # Contributing
 
-Go 1.6.2 で開発
+Do everything in Docker.
 
-## パッケージの依存管理
+## Ready for development
 
-[Glide](https://github.com/Masterminds/glide)を使います。
-下記に説明のない依存管理に関わる操作や設定は`glide help`かgideのドキュメントを参照して下さい。
+1. Create a directory `./.secret`.
+2. Create the service account JSON of Google Cloud at `./.secret/gcloud.json`.
 
-### ビルド環境の構築
+## Test
 
-```bash
-brew install glide
-glide install
-```
+Call `./bin/test` in your terminal.
 
-### Run
+## Run
 
-```bash
-go run main.go --id=ID --bucket=BUCKET --json=JSON --dbuser=DBUSER --dbprotocol=DBPROTOCOL --dbaddress=DBADDRESS --dbname=DBNAME
-```
+Call `./bin/run` in your terminal.
 
-ローカルで立ち上げてブラウザから試す。
+## Before writing some code
 
-```
-http://localhost:3000/?width=300&url=http://example.com/foo.jpg
-```
+Call `./bin/glide install` to create vendor directory in your host machine at the first time before writing some code.
 
-### Test
+## Glide
 
-```bash
-go test -v ./... -race
-```
+Call `./bin/glide` with some options.
 
-### Build
+- `./bin/glide update`: update packages
+- `./bin/glide get path/of/package`: get some packages
 
-```bash
-go build -v
-```
+## Release
 
-## Run/Test/Build に必要なフラグオプションと環境変数
-
-### 環境変数
-
-#### `RESIZER_LOG_FILENAME`
-ログを出力するファイル名です。空にしておくと標準出力にログを出力します。
-
-### フラグオプション
-
-#### `--id=ID`
-GCPのプロジェクト名です。設定されていなければ環境変数`RESIZER_PROJECT_ID`を使用します。
-
-#### `--bucket=BUCKET`
-GCSのバケット名です。設定されていなければ環境変数`RESIZER_BUCKET`を使用します。
-
-#### `--json=JSON`
-GCPのサービスアカウントの秘密鍵であるJSONファイルへのパスです。設定されていなければ環境変数`RESIZER_JSON`を使用します。
-
-#### `--dbuser=DBUSER`
-DBのユーザーネームです。設定されていなければ環境変数`RESIZER_DB_USER`を使用します。
-
-#### `--dbpassword=""`
-DBのパスワードです。設定されていなければ環境変数`RESIZER_DB_PASSWORD`を使用します。デフォルトは空文字です。
-
-#### `--dbprotocol=DBPROTOCOL`
-DBへの接続プロトコルです。詳しくは[github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql#protocol)を参照してください。設定されていなければ環境変数`RESIZER_DB_PROTOCOL`を使用します。
-
-#### `--dbaddress=DBADDRESS`
-DBのアドレスです。詳しくは[github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql#address)を参照してください。設定されていなければ環境変数`RESIZER_DB_ADDRESS`を使用します。
-
-#### `--dbname=DBNAME`
-データの保存先となるデータベース名です。設定されていなければ環境変数`RESIZER_DB_NAME`を使用します。
-
-#### `--host=HOST ...`
-許可する画像URLのホストです。localhostはデフォルトで許可されています。複数のホストを設定する場合は、`--host=example.com --host=example2.com`のようにします。設定されていなければ環境変数`RESIZER_HOSTS`をカンマで区切ったものを使用します。例: `example.com,example2.com`
-
-#### `--maxconn=10`
-最大同時接続数です。設定されていなければ環境変数`RESIZER_MAX_CONNECTION`を使用します。デフォルトは10です。
-
-## 定数
-
-### サーバーのポート
-
-`3000`番
-
-## デバッグ
-
-### ベンチマーク
-
-```bash
-go test processor/processor_bench_test.go -bench . -benchmem
-```
-
-### プロファイル
-
-[main.go](main.go)のpprof関連のコメントアウトを復帰しrunする。
-
-[http://localhost:6060/debug/pprof/](http://localhost:6060/debug/pprof/)
+Merge into release branch.
