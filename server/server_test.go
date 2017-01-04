@@ -1,19 +1,21 @@
 package server_test
 
 import (
-	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/server"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -66,7 +68,7 @@ func TestNew(t *testing.T) {
 			t.Fatalf("fail to get resized image at the 1st time: error=%v", err)
 		}
 		if resp.StatusCode != http.StatusOK {
-			t.Errorf("1st time should response as ok: expected %d, but actual %d", http.StatusOK, resp.StatusCode)
+			t.Errorf("1st time should response as OK: expected %d, but actual %d", http.StatusOK, resp.StatusCode)
 		}
 	}()
 
@@ -86,7 +88,7 @@ func TestNew(t *testing.T) {
 			t.Fatalf("fail to get resized image at the 2st time: error=%v", err)
 		}
 		if resp.StatusCode != http.StatusOK {
-			t.Errorf("response at the 2nd time should be ok: expected %d, but actual %d", http.StatusOK, resp.StatusCode)
+			t.Errorf("response at the 2nd time should be OK: expected %d, but actual %d", http.StatusOK, resp.StatusCode)
 		}
 	}()
 
@@ -104,24 +106,47 @@ func TestNew(t *testing.T) {
 			t.Errorf("fail to get resized image at the 3rd time: error=%v", err)
 		}
 		if resp.StatusCode != http.StatusOK {
-			t.Errorf("response at the 3rd time should be ok: expected %d, but actual %d", http.StatusOK, resp.StatusCode)
+			t.Errorf("response at the 3rd time should be OK: expected %d, but actual %d", http.StatusOK, resp.StatusCode)
 		}
 	}()
 }
+
+var (
+	rTitle   = regexp.MustCompile(`<title>(\d+ .+)<\/title>`)
+	rH1      = regexp.MustCompile(`<h1>(.+)<\/h1>`)
+	rP       = regexp.MustCompile(`<p>(.+)<\/p>`)
+	rAddress = regexp.MustCompile(`<address>(.+)\/(.+)<\/address>`)
+)
 
 func TestFail(t *testing.T) {
 	resp, err := http.Get(fmt.Sprintf("%s", appServer.URL))
 	if err != nil {
 		t.Fatalf("fail to get resized image at the 1st time: error=%v", err)
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusBadRequest {
-		t.Errorf("should be fail")
+	if a, e := resp.StatusCode, http.StatusBadRequest; a != e {
+		t.Errorf("the status text is expected `%d`, but actual `%d`", e, a)
 	}
-	dec := json.NewDecoder(resp.Body)
-	var v map[string]string
-	dec.Decode(&v)
-	if v["message"] == "" {
-		t.Errorf("should have a message")
+	if a, e := fmt.Sprintf("%d %s", http.StatusBadRequest, http.StatusText(http.StatusBadRequest)), resp.Status; a != e {
+		t.Errorf("the status is expected `%s`, but actual `%s`", e, a)
+	}
+
+	defer resp.Body.Close()
+	buf, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(errors.Wrap(err, "fail to read the response body"))
+	}
+	body := string(buf)
+	fmt.Println(body)
+	if a, e := rTitle.FindStringSubmatch(body)[1], "400 Bad Request"; a != e {
+		t.Errorf("the status in <title> is expected `%s`, but actual `%s`", e, a)
+	}
+	if a, e := rH1.FindStringSubmatch(body)[1], "Bad Request"; a != e {
+		t.Errorf("<h1> is expected `%s`, but actual `%s`", e, a)
+	}
+	if a, e := rP.FindStringSubmatch(body)[1], "URL shouldn't be empty"; a != e {
+		t.Errorf("<p> is expected `%s`, but actual `%s`", e, a)
+	}
+	if a, e := rAddress.FindStringSubmatch(body)[1], "Resizer"; a != e {
+		t.Errorf("the application name in <address> is expected `%s`, but actual `%s`", e, a)
 	}
 }

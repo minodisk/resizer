@@ -70,7 +70,7 @@ func TestUpload(t *testing.T) {
 }
 
 func TestCreateURL(t *testing.T) {
-	bucket := os.Getenv("RESIZER_BUCKET")
+	bucket := os.Getenv("GC_STORAGE_BUCKET")
 	path := "baz"
 	expected := fmt.Sprintf("https://%s.storage.googleapis.com/%s", bucket, path)
 	actual := u.CreateURL(path)
