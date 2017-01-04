@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	h, err := server.NewHandler(option.Options{
+	h, err := server.NewHandler(option.Option{
 		GCServiceAccount:    "/secret/gcloud.json",
 		MysqlDataSourceName: "root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True",
 		AllowedHosts:        []string{u.Host},

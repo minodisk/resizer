@@ -6,13 +6,6 @@ services:
     build:
       context: .
     environment:
-      # RESIZER_PROJECT_ID: syoya-tests
-      # RESIZER_BUCKET: resizer
-      # RESIZER_JSON: /secret/gcloud.json
-      # RESIZER_DB_USER: root
-      # RESIZER_DB_PROTOCOL: tcp
-      # RESIZER_DB_ADDRESS: mysql:3306
-      # RESIZER_DB_NAME: resizer
       ENVIRONMENT: development
       GC_PROJECT_ID: syoya-tests
       GC_STORAGE_BUCKET: resizer
