@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	tempDir string
+	tempDir = path.Join(os.TempDir(), "resizer")
 	expires time.Duration
 	client  *http.Client
 )
@@ -31,8 +31,6 @@ func init() {
 }
 
 func _init() error {
-	tempDir = path.Join(os.TempDir(), "")
-
 	var err error
 	expires, err = time.ParseDuration("1h")
 	if err != nil {

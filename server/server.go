@@ -105,7 +105,7 @@ type Handler struct {
 	Hosts    []string
 }
 
-func NewHandler(o option.Options) (Handler, error) {
+func NewHandler(o option.Option) (Handler, error) {
 	s, err := storage.New(o)
 	if err != nil {
 		return Handler{}, err
