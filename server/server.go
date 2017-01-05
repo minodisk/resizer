@@ -6,7 +6,6 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -15,6 +14,7 @@ import (
 	"github.com/alecthomas/template"
 	"github.com/go-microservices/resizer/fetcher"
 	"github.com/go-microservices/resizer/input"
+	"github.com/go-microservices/resizer/log"
 	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/processor"
 	"github.com/go-microservices/resizer/storage"
@@ -123,7 +123,7 @@ func (h *Handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	if req.URL.Path != "/" {
 		resp.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(resp, "Not Found")
-		log.Printf("'%s' not found", req.URL.Path)
+		log.Printf("'%s' not found\n", req.URL.Path)
 		return
 	}
 
@@ -171,21 +171,21 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 		ValidatedFormat:  i.ValidatedFormat,
 		ValidatedQuality: i.ValidatedQuality,
 	}).First(&cache)
-	log.Println(cache.ID)
+	log.Printf("cache.ID=%d\n", cache.ID)
 	if cache.ID != 0 {
-		log.Printf("validated cache %+v exists, requested with %+v", cache, i)
+		log.Printf("validated cache %+v exists, requested with %+v\n", cache, i)
 		url := h.Uploader.CreateURL(cache.Filename)
 		http.Redirect(resp, req, url, http.StatusSeeOther)
 		return nil
 	}
-	log.Printf("validated cache doesn't exist, requested with %+v", i)
+	log.Printf("validated cache doesn't exist, requested with %+v\n", i)
 
 	// 5. 元画像を取得する
 	// 6. リサイズの前処理をする
 	filename, err := fetcher.Fetch(i.ValidatedURL)
 	defer func() {
 		if err := fetcher.Clean(filename); err != nil {
-			log.Printf("fail to clean fetched file: %s", filename)
+			log.Printf("fail to clean fetched file: %s\n", filename)
 		}
 	}()
 	if err != nil {
@@ -216,12 +216,12 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 		ValidatedQuality: i.ValidatedQuality,
 	}).First(&cache)
 	if cache.ID != 0 {
-		log.Printf("normalized cache %+v exists, requested with %+v", cache, i)
+		log.Printf("normalized cache %+v exists, requested with %+v\n", cache, i)
 		url := h.Uploader.CreateURL(cache.Filename)
 		http.Redirect(resp, req, url, http.StatusSeeOther)
 		return nil
 	}
-	log.Printf("normalized cache doesn't exist, requested with %+v", i)
+	log.Printf("normalized cache doesn't exist, requested with %+v\n", i)
 
 	// 10. リサイズする
 	// 11. ファイルオブジェクトの処理結果フィールドを埋める
@@ -252,7 +252,7 @@ func (h *Handler) save(b []byte, f storage.Image) {
 	// 13. アップロードする
 	// 14. キャッシュをDBに格納する
 	if _, err := h.Uploader.Upload(bytes.NewBuffer(b), f); err != nil {
-		log.Println("fail to upload: error=%v", err)
+		log.Printf("fail to upload: error=%v\n", err)
 		return
 	}
 	h.Storage.NewRecord(f)

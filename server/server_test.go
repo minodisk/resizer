@@ -136,7 +136,6 @@ func TestFail(t *testing.T) {
 		t.Fatal(errors.Wrap(err, "fail to read the response body"))
 	}
 	body := string(buf)
-	fmt.Println(body)
 	if a, e := rTitle.FindStringSubmatch(body)[1], "400 Bad Request"; a != e {
 		t.Errorf("the status in <title> is expected `%s`, but actual `%s`", e, a)
 	}

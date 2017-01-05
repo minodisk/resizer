@@ -12,13 +12,13 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
-	"log"
 	"os"
 	"reflect"
 	"sync"
 
 	"github.com/BurntSushi/graphics-go/graphics/interp"
 	"github.com/go-microservices/resizer/input"
+	"github.com/go-microservices/resizer/log"
 	"github.com/go-microservices/resizer/storage"
 	"github.com/nfnt/resize"
 	"github.com/rwcarlsen/goexif/exif"
@@ -114,7 +114,10 @@ func orient(r io.Reader, i image.Image) (image.Image, error) {
 		log.Println("orientation tag isn't int")
 		return nil, err
 	}
+	return rotate(i, o)
+}
 
+func rotate(i image.Image, o int) (image.Image, error) {
 	// if o == 1 {
 	// 	return i, nil
 	// }
@@ -133,7 +136,8 @@ func orient(r io.Reader, i image.Image) (image.Image, error) {
 
 // Process はリサイズ処理を行い、エンコードしたデータを返します。
 func (self *Processor) Resize(i image.Image, w io.Writer, f storage.Image) (*image.Point, error) {
-	fmt.Printf("%+v\n", f)
+	log.Printf("dest image: %+v\n", f)
+
 	var ir image.Image
 	switch f.ValidatedMethod {
 	default:

@@ -4,13 +4,13 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"os"
 	"path"
 	"time"
 
+	"github.com/go-microservices/resizer/log"
 	"github.com/pkg/errors"
 )
 
@@ -52,6 +52,7 @@ func Fetch(url string) (string, error) {
 	sum := md5.Sum([]byte(fmt.Sprintf("%s-%d", url, time.Now().UnixNano())))
 	f := fmt.Sprintf("%x", sum)
 	filename := path.Join(tempDir, f)
+
 	log.Printf("file is temporary saved as %s\n", filename)
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -65,7 +66,8 @@ func Fetch(url string) (string, error) {
 	}
 
 	dump, _ := httputil.DumpRequest(req, true)
-	log.Printf("%s\n", dump)
+
+	log.Printf("Dump: %s\n", dump)
 
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("not ok: StatusCode=%d\n", resp.StatusCode)
@@ -73,15 +75,15 @@ func Fetch(url string) (string, error) {
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			log.Println(err)
+			log.Println(errors.Wrap(err, "fail to close response body"))
 		}
 	}()
-	log.Printf("ok: StatusCode=%d", resp.StatusCode)
+	log.Printf("ok: StatusCode=%d\n", resp.StatusCode)
 
 	file, err := os.Create(filename)
 	defer func() {
 		if err := file.Close(); err != nil {
-			log.Println(err)
+			log.Println(errors.Wrap(err, "fail to close file"))
 		}
 	}()
 	if err != nil {

@@ -3,9 +3,13 @@ version: '2'
 services:
 
   app:
+    environment:
+      RESIZER_ENV: test
     command: |-
       sh -c " \
         go test \
+          -bench . \
+          -benchmem \
           . \
           ./fetcher/... \
           ./input/... \
