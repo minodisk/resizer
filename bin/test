@@ -8,6 +8,7 @@ if [[ "$CIRCLECI" != "true" ]]; then
     -f docker-compose.test.yml \
     build
 fi
+mkdir -p ./.logs
 
 docker-compose \
   -f docker-compose.yml \
