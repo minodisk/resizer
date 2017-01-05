@@ -16,8 +16,8 @@ dependencies:
 
 test:
   pre:
-    - mkdir -p $HOME/$GITHUB_REPONAME/secret
-    - echo $GCLOUD_ACCOUNT_JSON | base64 --decode > $HOME/$GITHUB_REPONAME/secret/gcloud.json
+    - mkdir -p $HOME/$GITHUB_REPONAME/.secret
+    - echo $GCLOUD_ACCOUNT_JSON | base64 --decode > $HOME/$GITHUB_REPONAME/.secret/gcloud.json
   override:
     - ./bin/test
 
