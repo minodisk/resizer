@@ -99,7 +99,7 @@ func eval(t *testing.T, path string, f storage.Image, size image.Point, colors [
 	p := processor.New()
 	f.ValidatedWidth *= u
 	f.ValidatedHeight *= u
-	pixels, err := p.Load(path)
+	pixels, err := p.Preprocess(path)
 	if err != nil {
 		t.Fatalf("cannot preprocess image: error=%v", err)
 	}

@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"image"
 	"testing"
 
 	"github.com/go-microservices/resizer/input"
@@ -8,58 +9,47 @@ import (
 	"github.com/go-microservices/resizer/storage"
 )
 
+var (
+	huge image.Image
+)
+
+func init() {
+	var err error
+	huge, _, err = processor.Load("../fixtures/huge.jpg")
+	if err != nil {
+		panic(err)
+	}
+}
+
 type NopWriter struct{}
 
 func (w NopWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func BenchmarkHuge(b *testing.B) {
+func BenchmarkProcessHuge(b *testing.B) {
 	if err := process("../fixtures/huge.jpg"); err != nil {
 		b.Fatal(err)
 	}
 }
 
-func BenchmarkLarge(b *testing.B) {
+func BenchmarkProcessLarge(b *testing.B) {
 	if err := process("../fixtures/large.jpg"); err != nil {
 		b.Fatal(err)
 	}
 }
 
-func BenchmarkMedium(b *testing.B) {
+func BenchmarkProcessMedium(b *testing.B) {
 	if err := process("../fixtures/medium.jpg"); err != nil {
 		b.Fatal(err)
 	}
 }
 
-func BenchmarkSmall(b *testing.B) {
+func BenchmarkProcessSmall(b *testing.B) {
 	if err := process("../fixtures/small.jpg"); err != nil {
 		b.Fatal(err)
 	}
 }
-
-// func BenchmarkMemory(b *testing.B) {
-// 	go func() {
-// 		var mem runtime.MemStats
-// 		for {
-// 			runtime.ReadMemStats(&mem)
-// 			fmt.Printf("%d\t%d\t%d\t%d\n", mem.Alloc, mem.TotalAlloc, mem.HeapAlloc, mem.HeapSys)
-// 			time.Sleep(time.Second * 1)
-// 		}
-// 	}()
-//
-// 	wg := new(sync.WaitGroup)
-// 	for i := 0; i < 100; i++ {
-// 		wg.Add(1)
-// 		go func() {
-// 			if err := process(b, "../fixtures/medium.jpg"); err != nil {
-// 				b.Fatal(err)
-// 			}
-// 			wg.Done()
-// 		}()
-// 	}
-// 	wg.Wait()
-// }
 
 func process(path string) error {
 	p := processor.New()
@@ -77,5 +67,61 @@ func process(path string) error {
 	if _, err = p.Process(path, &w, i); err != nil {
 		return err
 	}
+	return nil
+}
+
+func BenchmarkRotate1(b *testing.B) {
+	if err := rotateHuge(1); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkRotate2(b *testing.B) {
+	if err := rotateHuge(2); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkRotate3(b *testing.B) {
+	if err := rotateHuge(3); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkRotate4(b *testing.B) {
+	if err := rotateHuge(4); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkRotate5(b *testing.B) {
+	if err := rotateHuge(5); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkRotate6(b *testing.B) {
+	if err := rotateHuge(6); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkRotate7(b *testing.B) {
+	if err := rotateHuge(7); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkRotate8(b *testing.B) {
+	if err := rotateHuge(8); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func rotateHuge(o int) error {
+	if _, err := processor.Rotate(huge, o); err != nil {
+		return err
+	}
+
 	return nil
 }

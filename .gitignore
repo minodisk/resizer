@@ -24,8 +24,9 @@ gin-bin
 # secret
 .secret
 
+# Benchmark Logs
+.logs/*.log
+
 # Compiled File
 resizer
 dist
-
-*.log

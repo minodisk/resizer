@@ -194,7 +194,7 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 	var b []byte
 	buf := bytes.NewBuffer(b)
 	p := processor.New()
-	pixels, err := p.Load(filename)
+	pixels, err := p.Preprocess(filename)
 	if err != nil {
 		return err
 	}
