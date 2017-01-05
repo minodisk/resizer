@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
+	"github.com/go-microservices/resizer/log"
 )
 
 const (
@@ -35,7 +36,7 @@ func Load(filepath string) (Options, error) {
 		return o, err
 	}
 
-	fmt.Printf("%+v", o)
+	log.Printf("Options: %+v\n", o)
 
 	return o, nil
 }

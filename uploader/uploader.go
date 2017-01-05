@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 
 	gcs "cloud.google.com/go/storage"
+	"github.com/go-microservices/resizer/log"
 	"github.com/go-microservices/resizer/option"
 	"github.com/go-microservices/resizer/storage"
 	"github.com/pkg/errors"
@@ -46,7 +46,7 @@ func (u *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error) {
 	if err := w.Close(); err != nil {
 		return "", errors.Wrap(err, "can't close object writer")
 	}
-	log.Printf("Write %d bytes object '%s' in bucket '%s'", written, f.Filename, u.bucketName)
+	log.Printf("Write %d bytes object '%s' in bucket '%s'\n", written, f.Filename, u.bucketName)
 
 	attrs, err := object.Update(u.context, gcs.ObjectAttrsToUpdate{
 		ContentType:  f.ContentType,
@@ -55,7 +55,7 @@ func (u *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "can't update object attributes")
 	}
-	log.Printf("Attributes: %+v", *attrs)
+	log.Printf("Attributes: %+v\n", *attrs)
 
 	url := u.CreateURL(f.Filename)
 	return url, nil
