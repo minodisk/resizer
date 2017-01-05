@@ -72,18 +72,23 @@ func getOrientation(r io.Reader) (int, error) {
 }
 
 func rotate(src image.Image, o int) (image.Image, error) {
-	// if o == 1 {
-	// 	return src, nil
-	// }
+	if o == 1 {
+		return src, nil
+	}
 
 	rect := src.Bounds()
 	// orientation=5~8 なら画像サイズの縦横を入れ替える
 	if o >= 5 && o <= 8 {
-		rect = RotateRect(rect)
+		rect = rotateRect(rect)
 	}
 	d := image.NewRGBA(rect)
 	a := affines[o]
 	a.TransformCenter(d, src, interp.Bilinear)
 
 	return d, nil
+}
+
+func rotateRect(r image.Rectangle) image.Rectangle {
+	s := r.Size()
+	return image.Rectangle{r.Min, image.Point{s.Y, s.X}}
 }
