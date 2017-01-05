@@ -20,7 +20,12 @@ func load(path string) (image.Image, string, error) {
 	}
 	defer f.Close()
 
-	return image.Decode(bufio.NewReader(f))
+	src, format, err := image.Decode(bufio.NewReader(f))
+	if err != nil {
+		return src, format, errors.Wrap(err, "fail to decode image")
+	}
+
+	return src, format, nil
 }
 
 func applyOrientation(src image.Image, format, path string) (image.Image, error) {
