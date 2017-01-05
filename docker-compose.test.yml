@@ -5,6 +5,8 @@ services:
   app:
     environment:
       RESIZER_ENV: test
+    volumes:
+      - ./.logs:/go/src/github.com/go-microservices/resizer/.logs
     command: |-
       sh -c " \
         go test \
@@ -18,4 +20,8 @@ services:
           ./server/... \
           ./storage/... \
           ./uploader/... \
+        | \
+        tee ./.logs/`date +'%Y%m%d%H%M%S'`.log \
+        && \
+        benchcmp ./.logs/`ls -t -r .logs | head -1` ./.logs/`ls -t .logs | head -1` \
       "

@@ -5,6 +5,7 @@ WORKDIR /go/src/github.com/go-microservices/resizer
 RUN apk --update add \
       git && \
     go get -u \
+      golang.org/x/tools/cmd/benchcmp \
       github.com/Masterminds/glide \
       github.com/codegangsta/gin \
       github.com/jteeuwen/go-bindata/...
