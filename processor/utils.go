@@ -73,7 +73,7 @@ func getOrientation(r io.Reader) (int, error) {
 
 func rotate(src image.Image, o int) (image.Image, error) {
 	// if o == 1 {
-	// 	return i, nil
+	// 	return src, nil
 	// }
 
 	rect := src.Bounds()
@@ -81,7 +81,7 @@ func rotate(src image.Image, o int) (image.Image, error) {
 	if o >= 5 && o <= 8 {
 		rect = RotateRect(rect)
 	}
-	d := image.NewRGBA64(rect)
+	d := image.NewRGBA(rect)
 	a := affines[o]
 	a.TransformCenter(d, src, interp.Bilinear)
 
