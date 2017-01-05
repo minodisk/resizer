@@ -3,7 +3,6 @@ package fetcher_test
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -25,7 +24,6 @@ func TestMain(m *testing.M) {
 			panic(err)
 		}
 		p := path.Join(dir, "..", "fixtures", r.URL.Path[1:])
-		log.Println(p)
 		http.ServeFile(w, r, p)
 	}))
 

@@ -5,7 +5,6 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"testing"
@@ -56,8 +55,7 @@ func TestUpload(t *testing.T) {
 		t.Fatalf("wrong Content-Type: expected %s, but actual %s", f.ContentType, ct)
 	}
 
-	cc := resp.Header.Get("Cache-Control")
-	log.Println(cc)
+	// log.Println(resp.Header.Get("Cache-Control"))
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

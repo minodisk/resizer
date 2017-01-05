@@ -24,6 +24,7 @@ func New(o option.Option) (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
+	db.LogMode(false)
 	// db.LogMode(true)
 	// db.SetLogger(&Logger{})
 	if os.Getenv("ENVIRONMENT") == "development" {

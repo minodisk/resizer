@@ -63,10 +63,12 @@ func BenchmarkSmall(b *testing.B) {
 
 func process(path string) error {
 	p := processor.New()
-	i, err := storage.NewImage(input.Input{
+	input := input.Input{
 		URL:   "http://example.com/test.jpg",
 		Width: 800,
-	})
+	}
+	input, err := input.Validate([]string{"example.com"})
+	i, err := storage.NewImage(input)
 	if err != nil {
 		return err
 	}
