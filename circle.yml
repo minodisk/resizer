@@ -11,13 +11,12 @@ dependencies:
     - ~/.docker
   pre:
     - sudo pip install docker-compose
-  override:
-    - docker-compose build
 
 test:
   pre:
     - mkdir -p $HOME/$GITHUB_REPONAME/.secret
     - echo $GCLOUD_ACCOUNT_JSON | base64 --decode > $HOME/$GITHUB_REPONAME/.secret/gcloud.json
+    - docker-compose build
   override:
     - ./bin/test
 
