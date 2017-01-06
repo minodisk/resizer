@@ -1,6 +1,7 @@
 package processor_test
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"reflect"
@@ -15,36 +16,92 @@ type Pixels struct {
 }
 
 var (
-	colors = map[int]color.Color{
-		0: color.Black,
-		1: color.White,
+	black  = color.RGBA{0, 0, 0, 0xff}
+	white  = color.RGBA{0xff, 0xff, 0xff, 0xff}
+	colors = map[int]color.RGBA{
+		0: black,
+		1: white,
 	}
 )
 
+// func init() {
+// 	fmt.Println(Visualize(NewImage(Pixels{
+// 		size: image.Pt(6, 5),
+// 		matrix: []int{
+// 			1, 0, 0, 0, 0, 1,
+// 			0, 1, 1, 1, 1, 0,
+// 			0, 0, 1, 0, 1, 0,
+// 			0, 0, 1, 0, 1, 0,
+// 			1, 0, 0, 0, 0, 1,
+// 		},
+// 	})))
+// }
+
 func NewImage(pixels Pixels) image.Image {
-	input := image.NewRGBA(image.Rect(0, 0, pixels.size.X, pixels.size.Y))
-	for y := 0; y < pixels.size.Y; y++ {
-		for x := 0; x < pixels.size.X; x++ {
-			at := pixels.size.X*y + x
-			color := colors[pixels.matrix[at]]
-			input.Set(x, y, color)
+	w := pixels.size.X
+	b := image.Rect(0, 0, pixels.size.X, pixels.size.Y)
+	i := image.NewRGBA(b)
+	// log.Println("-------", b.Dx(), b.Dy())
+	for y := b.Min.Y; y < b.Max.Y; y++ {
+		dy := y - b.Min.Y
+		for x := b.Min.X; x < b.Max.X; x++ {
+			dx := x - b.Min.X
+			pos := w*dy + dx
+			i.SetRGBA(x, y, colors[pixels.matrix[pos]])
+			// log.Println(x, y, pos, colors[pixels.matrix[pos]], i.At(x, y))
 		}
 	}
-	return input
+	return i
 }
 
-func TestRotate(t *testing.T) {
+func Visualize(i image.Image) string {
+	// log.Println("=======")
+	b := i.Bounds()
+	s := ""
+	for y := b.Min.Y; y < b.Max.Y; y++ {
+		for x := b.Min.X; x < b.Max.X; x++ {
+			c := i.At(x, y)
+			// log.Println(x, y, c, isBlack(c), isWhite(c))
+			if isBlack(c) {
+				s += "□"
+				continue
+			}
+			if isWhite(c) {
+				s += "■"
+				continue
+			}
+			s += "○"
+		}
+		s += "\n"
+	}
+	s += fmt.Sprintf("Origin: %v, Size: %s", b.Min, b.Size())
+	return s
+}
+
+func isBlack(c color.Color) bool {
+	r, g, b, a := c.RGBA()
+	br, bg, bb, ba := black.RGBA()
+	return r == br && g == bg && b == bb && a == ba
+}
+
+func isWhite(c color.Color) bool {
+	r, g, b, a := c.RGBA()
+	wr, wg, wb, wa := white.RGBA()
+	return r == wr && g == wg && b == wb && a == wa
+}
+
+func TestOrient1to8(t *testing.T) {
 	type Case struct {
-		spec        string
-		orientation int
-		input       Pixels
-		expected    Pixels
+		spec     string
+		orient   func(image.Image) image.Image
+		input    Pixels
+		expected Pixels
 	}
 
 	cases := []Case{
 		{
-			spec:        "Can rotate correctly with orientation tag 1",
-			orientation: 1,
+			spec:   "Can rotate correctly with orientation tag 1",
+			orient: processor.Orient1,
 			input: Pixels{
 				size: image.Pt(5, 6),
 				matrix: []int{
@@ -69,8 +126,8 @@ func TestRotate(t *testing.T) {
 			},
 		},
 		{
-			spec:        "Can rotate correctly with orientation tag 2",
-			orientation: 2,
+			spec:   "Can rotate correctly with orientation tag 2",
+			orient: processor.Orient2,
 			input: Pixels{
 				size: image.Pt(5, 6),
 				matrix: []int{
@@ -95,8 +152,8 @@ func TestRotate(t *testing.T) {
 			},
 		},
 		{
-			spec:        "Can rotate correctly with orientation tag 3",
-			orientation: 3,
+			spec:   "Can rotate correctly with orientation tag 3",
+			orient: processor.Orient3,
 			input: Pixels{
 				size: image.Pt(5, 6),
 				matrix: []int{
@@ -121,8 +178,8 @@ func TestRotate(t *testing.T) {
 			},
 		},
 		{
-			spec:        "Can rotate correctly with orientation tag 4",
-			orientation: 4,
+			spec:   "Can rotate correctly with orientation tag 4",
+			orient: processor.Orient4,
 			input: Pixels{
 				size: image.Pt(5, 6),
 				matrix: []int{
@@ -147,8 +204,8 @@ func TestRotate(t *testing.T) {
 			},
 		},
 		{
-			spec:        "Can rotate correctly with orientation tag 5",
-			orientation: 5,
+			spec:   "Can rotate correctly with orientation tag 5",
+			orient: processor.Orient5,
 			input: Pixels{
 				size: image.Pt(5, 6),
 				matrix: []int{
@@ -172,8 +229,33 @@ func TestRotate(t *testing.T) {
 			},
 		},
 		{
-			spec:        "Can rotate correctly with orientation tag 6",
-			orientation: 6,
+			spec:   "Can rotate correctly with orientation tag 6",
+			orient: processor.Orient6,
+			input: Pixels{
+				size: image.Pt(5, 6),
+				matrix: []int{
+					1, 0, 0, 0, 1,
+					0, 1, 1, 1, 0,
+					0, 1, 0, 0, 0,
+					0, 1, 1, 1, 0,
+					0, 1, 0, 0, 0,
+					1, 0, 0, 0, 1,
+				},
+			},
+			expected: Pixels{
+				size: image.Pt(6, 5),
+				matrix: []int{
+					1, 0, 0, 0, 0, 1,
+					0, 1, 1, 1, 1, 0,
+					0, 0, 1, 0, 1, 0,
+					0, 0, 1, 0, 1, 0,
+					1, 0, 0, 0, 0, 1,
+				},
+			},
+		},
+		{
+			spec:   "Can rotate correctly with orientation tag 7",
+			orient: processor.Orient7,
 			input: Pixels{
 				size: image.Pt(5, 6),
 				matrix: []int{
@@ -189,31 +271,6 @@ func TestRotate(t *testing.T) {
 				size: image.Pt(6, 5),
 				matrix: []int{
 					0, 0, 0, 0, 0, 0,
-					0, 1, 1, 1, 1, 0,
-					0, 0, 1, 0, 1, 0,
-					0, 0, 1, 0, 1, 0,
-					0, 0, 0, 0, 0, 0,
-				},
-			},
-		},
-		{
-			spec:        "Can rotate correctly with orientation tag 7",
-			orientation: 7,
-			input: Pixels{
-				size: image.Pt(5, 6),
-				matrix: []int{
-					0, 0, 0, 0, 0,
-					0, 1, 1, 1, 0,
-					0, 1, 0, 0, 0,
-					0, 1, 1, 1, 0,
-					0, 1, 0, 0, 0,
-					0, 0, 0, 0, 0,
-				},
-			},
-			expected: Pixels{
-				size: image.Pt(6, 5),
-				matrix: []int{
-					0, 0, 0, 0, 0, 0,
 					0, 0, 1, 0, 1, 0,
 					0, 0, 1, 0, 1, 0,
 					0, 1, 1, 1, 1, 0,
@@ -222,8 +279,8 @@ func TestRotate(t *testing.T) {
 			},
 		},
 		{
-			spec:        "Can rotate correctly with orientation tag 8",
-			orientation: 8,
+			spec:   "Can rotate correctly with orientation tag 8",
+			orient: processor.Orient8,
 			input: Pixels{
 				size: image.Pt(5, 6),
 				matrix: []int{
@@ -249,13 +306,8 @@ func TestRotate(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		a, err := processor.Rotate(NewImage(c.input), c.orientation)
-		if err != nil {
-			t.Errorf("%s. Fail to rotate image with error: %s", err)
-			continue
-		}
-		if e := NewImage(c.expected); !reflect.DeepEqual(a, e) {
-			t.Errorf("%s. Rotated image is expected:\n%+v\nbut actual:\n%+v\n", c.spec, e, a)
+		if a, e := c.orient(NewImage(c.input)), NewImage(c.expected); !reflect.DeepEqual(a, e) {
+			t.Errorf("%s. Rotated image is expected:\n%s\nbut actual:\n%s\n", c.spec, Visualize(e), Visualize(a))
 		}
 	}
 }

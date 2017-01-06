@@ -59,12 +59,17 @@ func (p *Processor) process(m *sync.Mutex, c chan Result, path string, w io.Writ
 // Preprocess はリサイズ処理の前処理を行います。
 // 画像をデコードし、JPEGのEXIFデータの回転情報をピクセルに反映して返します。
 func (self *Processor) Preprocess(path string) (image.Image, error) {
-	src, format, err := load(path)
+	src, format, err := Load(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "fail to load image")
 	}
 
-	dst, err := applyOrientation(src, format, path)
+	// JPEG以外ならピクセルをそのまま返す
+	if format != input.FormatJPEG {
+		return src, nil
+	}
+
+	dst, err := ApplyOrientation(path, src)
 	if err != nil {
 		return nil, errors.Wrapf(err, "fail to apply orientation")
 	}

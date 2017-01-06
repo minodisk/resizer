@@ -71,57 +71,33 @@ func process(path string) error {
 }
 
 func BenchmarkRotate1(b *testing.B) {
-	if err := rotateHuge(1); err != nil {
-		b.Fatal(err)
-	}
+	processor.Orient1(huge)
 }
 
 func BenchmarkRotate2(b *testing.B) {
-	if err := rotateHuge(2); err != nil {
-		b.Fatal(err)
-	}
+	processor.Orient2(huge)
 }
 
 func BenchmarkRotate3(b *testing.B) {
-	if err := rotateHuge(3); err != nil {
-		b.Fatal(err)
-	}
+	processor.Orient3(huge)
 }
 
 func BenchmarkRotate4(b *testing.B) {
-	if err := rotateHuge(4); err != nil {
-		b.Fatal(err)
-	}
+	processor.Orient4(huge)
 }
 
 func BenchmarkRotate5(b *testing.B) {
-	if err := rotateHuge(5); err != nil {
-		b.Fatal(err)
-	}
+	processor.Orient5(huge)
 }
 
 func BenchmarkRotate6(b *testing.B) {
-	if err := rotateHuge(6); err != nil {
-		b.Fatal(err)
-	}
+	processor.Orient6(huge)
 }
 
 func BenchmarkRotate7(b *testing.B) {
-	if err := rotateHuge(7); err != nil {
-		b.Fatal(err)
-	}
+	processor.Orient7(huge)
 }
 
 func BenchmarkRotate8(b *testing.B) {
-	if err := rotateHuge(8); err != nil {
-		b.Fatal(err)
-	}
-}
-
-func rotateHuge(o int) error {
-	if _, err := processor.Rotate(huge, o); err != nil {
-		return err
-	}
-
-	return nil
+	processor.Orient8(huge)
 }
