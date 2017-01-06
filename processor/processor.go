@@ -11,10 +11,12 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"os"
 	"sync"
 
 	"github.com/go-microservices/resizer/input"
 	"github.com/go-microservices/resizer/log"
+	"github.com/go-microservices/resizer/orientation"
 	"github.com/go-microservices/resizer/storage"
 	"github.com/nfnt/resize"
 	"github.com/pkg/errors"
@@ -56,20 +58,27 @@ func (p *Processor) process(m *sync.Mutex, c chan Result, path string, w io.Writ
 	c <- Result{pt, err}
 }
 
-// Preprocess はリサイズ処理の前処理を行います。
-// 画像をデコードし、JPEGのEXIFデータの回転情報をピクセルに反映して返します。
-func (self *Processor) Preprocess(path string) (image.Image, error) {
-	src, format, err := Load(path)
+// Preprocess load image and EXIF from file at filename.
+// When orientation tag exists in EXIF, orient pixels in
+// image.
+func (self *Processor) Preprocess(filename string) (image.Image, error) {
+	src, format, err := Load(filename)
 	if err != nil {
 		return nil, errors.Wrapf(err, "fail to load image")
 	}
 
-	// JPEG以外ならピクセルをそのまま返す
+	// Finish, when format isn't JPEG.
 	if format != input.FormatJPEG {
 		return src, nil
 	}
 
-	dst, err := ApplyOrientation(path, src)
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	dst, err := orientation.Apply(f, src)
 	if err != nil {
 		return nil, errors.Wrapf(err, "fail to apply orientation")
 	}
@@ -77,7 +86,23 @@ func (self *Processor) Preprocess(path string) (image.Image, error) {
 	return dst, nil
 }
 
-// Process はリサイズ処理を行い、エンコードしたデータを返します。
+// Load decodes image from file at filename.
+// It returns decoded image, the format of image, and any error occurred.
+func Load(filename string) (image.Image, string, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, "", errors.Wrap(err, "fail to open file")
+	}
+	defer f.Close()
+	src, format, err := image.Decode(f)
+	if err != nil {
+		return src, format, errors.Wrap(err, "fail to decode file as image")
+	}
+	return src, format, nil
+}
+
+// Process writes resized i to w with options in f.
+// Returns the size of resized i and any error occurred.
 func (self *Processor) Resize(i image.Image, w io.Writer, f storage.Image) (*image.Point, error) {
 	log.Printf("dest image: %+v\n", f)
 

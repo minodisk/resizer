@@ -18,6 +18,7 @@ services:
           ./fetcher/... \
           ./input/... \
           ./option/... \
+          ./orientation/... \
           ./processor/... \
           ./server/... \
           ./storage/... \

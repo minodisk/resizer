@@ -1,7 +1,6 @@
 package processor_test
 
 import (
-	"image"
 	"testing"
 
 	"github.com/go-microservices/resizer/input"
@@ -9,46 +8,10 @@ import (
 	"github.com/go-microservices/resizer/storage"
 )
 
-var (
-	huge image.Image
-)
-
-func init() {
-	var err error
-	huge, _, err = processor.Load("../fixtures/huge.jpg")
-	if err != nil {
-		panic(err)
-	}
-}
-
 type NopWriter struct{}
 
 func (w NopWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
-}
-
-func BenchmarkProcessHuge(b *testing.B) {
-	if err := process("../fixtures/huge.jpg"); err != nil {
-		b.Fatal(err)
-	}
-}
-
-func BenchmarkProcessLarge(b *testing.B) {
-	if err := process("../fixtures/large.jpg"); err != nil {
-		b.Fatal(err)
-	}
-}
-
-func BenchmarkProcessMedium(b *testing.B) {
-	if err := process("../fixtures/medium.jpg"); err != nil {
-		b.Fatal(err)
-	}
-}
-
-func BenchmarkProcessSmall(b *testing.B) {
-	if err := process("../fixtures/small.jpg"); err != nil {
-		b.Fatal(err)
-	}
 }
 
 func process(path string) error {
@@ -70,34 +33,194 @@ func process(path string) error {
 	return nil
 }
 
-func BenchmarkRotate1(b *testing.B) {
-	processor.Orient1(huge)
+func BenchmarkProcessHuge1(b *testing.B) {
+	if err := process("../fixtures/huge-1.jpg"); err != nil {
+		b.Fatal(err)
+	}
 }
 
-func BenchmarkRotate2(b *testing.B) {
-	processor.Orient2(huge)
+func BenchmarkProcessHuge2(b *testing.B) {
+	if err := process("../fixtures/huge-2.jpg"); err != nil {
+		b.Fatal(err)
+	}
 }
 
-func BenchmarkRotate3(b *testing.B) {
-	processor.Orient3(huge)
+func BenchmarkProcessHuge3(b *testing.B) {
+	if err := process("../fixtures/huge-3.jpg"); err != nil {
+		b.Fatal(err)
+	}
 }
 
-func BenchmarkRotate4(b *testing.B) {
-	processor.Orient4(huge)
+func BenchmarkProcessHuge4(b *testing.B) {
+	if err := process("../fixtures/huge-4.jpg"); err != nil {
+		b.Fatal(err)
+	}
 }
 
-func BenchmarkRotate5(b *testing.B) {
-	processor.Orient5(huge)
+func BenchmarkProcessHuge5(b *testing.B) {
+	if err := process("../fixtures/huge-5.jpg"); err != nil {
+		b.Fatal(err)
+	}
 }
 
-func BenchmarkRotate6(b *testing.B) {
-	processor.Orient6(huge)
+func BenchmarkProcessHuge6(b *testing.B) {
+	if err := process("../fixtures/huge-6.jpg"); err != nil {
+		b.Fatal(err)
+	}
 }
 
-func BenchmarkRotate7(b *testing.B) {
-	processor.Orient7(huge)
+func BenchmarkProcessHuge7(b *testing.B) {
+	if err := process("../fixtures/huge-7.jpg"); err != nil {
+		b.Fatal(err)
+	}
 }
 
-func BenchmarkRotate8(b *testing.B) {
-	processor.Orient8(huge)
+func BenchmarkProcessHuge8(b *testing.B) {
+	if err := process("../fixtures/huge-8.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessLarge1(b *testing.B) {
+	if err := process("../fixtures/large-1.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessLarge2(b *testing.B) {
+	if err := process("../fixtures/large-2.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessLarge3(b *testing.B) {
+	if err := process("../fixtures/large-3.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessLarge4(b *testing.B) {
+	if err := process("../fixtures/large-4.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessLarge5(b *testing.B) {
+	if err := process("../fixtures/large-5.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessLarge6(b *testing.B) {
+	if err := process("../fixtures/large-6.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessLarge7(b *testing.B) {
+	if err := process("../fixtures/large-7.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessLarge8(b *testing.B) {
+	if err := process("../fixtures/large-8.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessMedium1(b *testing.B) {
+	if err := process("../fixtures/medium-1.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessMedium2(b *testing.B) {
+	if err := process("../fixtures/medium-2.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessMedium3(b *testing.B) {
+	if err := process("../fixtures/medium-3.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessMedium4(b *testing.B) {
+	if err := process("../fixtures/medium-4.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessMedium5(b *testing.B) {
+	if err := process("../fixtures/medium-5.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessMedium6(b *testing.B) {
+	if err := process("../fixtures/medium-6.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessMedium7(b *testing.B) {
+	if err := process("../fixtures/medium-7.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessMedium8(b *testing.B) {
+	if err := process("../fixtures/medium-8.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessSmall1(b *testing.B) {
+	if err := process("../fixtures/small-1.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessSmall2(b *testing.B) {
+	if err := process("../fixtures/small-2.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessSmall3(b *testing.B) {
+	if err := process("../fixtures/small-3.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessSmall4(b *testing.B) {
+	if err := process("../fixtures/small-4.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessSmall5(b *testing.B) {
+	if err := process("../fixtures/small-5.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessSmall6(b *testing.B) {
+	if err := process("../fixtures/small-6.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessSmall7(b *testing.B) {
+	if err := process("../fixtures/small-7.jpg"); err != nil {
+		b.Fatal(err)
+	}
+}
+
+func BenchmarkProcessSmall8(b *testing.B) {
+	if err := process("../fixtures/small-8.jpg"); err != nil {
+		b.Fatal(err)
+	}
 }

@@ -1,10 +1,9 @@
-package processor
+package orientation
 
 import (
 	"fmt"
 	"image"
 	"io"
-	"os"
 
 	"github.com/pkg/errors"
 	"github.com/rwcarlsen/goexif/exif"
@@ -22,41 +21,21 @@ const (
 	Orientation8 = 8
 )
 
-// Load decodes image from file at filename.
-// It returns decoded image, the format of image, and any error occurred.
-func Load(filename string) (image.Image, string, error) {
-	f, err := os.Open(filename)
-	if err != nil {
-		return nil, "", errors.Wrap(err, "fail to open file")
-	}
-	defer f.Close()
-	src, format, err := image.Decode(f)
-	if err != nil {
-		return src, format, errors.Wrap(err, "fail to decode file as image")
-	}
-	return src, format, nil
-}
-
-// ApplyOrientation read orientation tag from file at filename
+// Apply read orientation tag from file at filename
 // and applies it to src image.
 // Returns oriented image and any error occurred.
-func ApplyOrientation(filename string, src image.Image) (image.Image, error) {
-	f, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	o, err := ReadOrientation(f)
-	// When fails to get orientation tag from EXIF, finishes preprocessing.
+func Apply(r io.Reader, src image.Image) (image.Image, error) {
+	o, err := Read(r)
+	// When fails to read orientation tag from EXIF, finishes preprocessing.
 	if err != nil {
 		return src, nil
 	}
 	return Orient(src, o)
 }
 
-// ReadOrientation decodes orientation tag in EXIF from r.
+// Read decodes orientation tag in EXIF from r.
 // Returns orientation tag and any error occurred.
-func ReadOrientation(r io.Reader) (int, error) {
+func Read(r io.Reader) (int, error) {
 	e, err := exif.Decode(r)
 	if err != nil {
 		return 0, errors.Wrap(err, "fail to decode EXIF")
@@ -76,6 +55,15 @@ func ReadOrientation(r io.Reader) (int, error) {
 // Returns a new oriented image.
 // When o is invalid as orientation tag, returns error.
 func Orient(s image.Image, o int) (image.Image, error) {
+	// rect := s.Bounds()
+	// if o >= 5 && o <= 8 {
+	// 	rect = SwapRect(rect)
+	// }
+	// d := image.NewRGBA64(rect)
+	// a := affines[o]
+	// a.TransformCenter(d, s, interp.Bilinear)
+	// return d, nil
+
 	switch o {
 	case Orientation1:
 		return Orient1(s), nil
@@ -101,7 +89,7 @@ func Orient(s image.Image, o int) (image.Image, error) {
 // Orient1 returns s.
 // 	111    111
 // 	100    100
-// 	111 -> 111
+// 	110 -> 110
 // 	100    100
 // 	100    100
 func Orient1(s image.Image) image.Image {
@@ -112,7 +100,7 @@ func Orient1(s image.Image) image.Image {
 // right side to left side.
 // 	111    111
 // 	001    100
-// 	111 -> 111
+// 	011 -> 110
 // 	001    100
 // 	001    100
 func Orient2(s image.Image) image.Image {
@@ -133,7 +121,7 @@ func Orient2(s image.Image) image.Image {
 // bottom to top and right side to left side.
 // 	001    111
 // 	001    100
-// 	111 -> 111
+// 	011 -> 110
 // 	001    100
 // 	111    100
 func Orient3(s image.Image) image.Image {
@@ -154,7 +142,7 @@ func Orient3(s image.Image) image.Image {
 // bottom to top.
 // 	100    111
 // 	100    100
-// 	111 -> 111
+// 	110 -> 110
 // 	100    100
 // 	111    100
 func Orient4(s image.Image) image.Image {
@@ -175,8 +163,8 @@ func Orient4(s image.Image) image.Image {
 // left side to top and top to left side.
 // 	         111
 // 	11111    100
-// 	10100 -> 111
-// 	10100    100
+// 	10100 -> 110
+// 	10000    100
 // 	         100
 func Orient5(s image.Image) image.Image {
 	sr := s.Bounds()
@@ -193,11 +181,11 @@ func Orient5(s image.Image) image.Image {
 }
 
 // Orient6 returns oriented s that is replaced
-// right side to top and top to left side.
+// left side to top and bottom to left side.
 // 	         111
+// 	10000    100
+// 	10100 -> 110
 // 	11111    100
-// 	00101 -> 111
-// 	00101    100
 // 	         100
 func Orient6(s image.Image) image.Image {
 	sr := s.Bounds()
@@ -216,8 +204,8 @@ func Orient6(s image.Image) image.Image {
 // Orient7 returns oriented s that is replaced
 // right side to top and bottom to left side.
 // 	         111
-// 	00101    100
-// 	00101 -> 111
+// 	00001    100
+// 	00101 -> 110
 // 	11111    100
 // 	         100
 func Orient7(s image.Image) image.Image {
@@ -235,11 +223,11 @@ func Orient7(s image.Image) image.Image {
 }
 
 // Orient8 returns oriented s that is replaced
-// left side to top and bottom to left side.
+// right side to top and bottom to left side.
 // 	         111
-// 	10100    100
-// 	10100 -> 111
 // 	11111    100
+// 	00101 -> 110
+// 	00001    100
 // 	         100
 func Orient8(s image.Image) image.Image {
 	sr := s.Bounds()
