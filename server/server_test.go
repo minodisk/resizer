@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-microservices/resizer/option"
-	"github.com/go-microservices/resizer/server"
+	"github.com/minodisk/resizer/option"
+	"github.com/minodisk/resizer/server"
 	"github.com/pkg/errors"
 )
 

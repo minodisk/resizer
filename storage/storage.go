@@ -4,9 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/go-microservices/resizer/option"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	"github.com/minodisk/resizer/option"
 )
 
 type Logger struct{}

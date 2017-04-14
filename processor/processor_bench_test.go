@@ -1,17 +1,24 @@
 package processor_test
 
 import (
+	"os"
 	"testing"
 
-	"github.com/go-microservices/resizer/input"
-	"github.com/go-microservices/resizer/processor"
-	"github.com/go-microservices/resizer/storage"
+	"github.com/minodisk/resizer/input"
+	"github.com/minodisk/resizer/processor"
+	"github.com/minodisk/resizer/storage"
 )
 
 type NopWriter struct{}
 
 func (w NopWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
+}
+
+func BenchmarkMain(m *testing.M) {
+	// https://resizer-fixtures.storage.googleapis.com/f-orientation-1.jpg
+	code := m.Run()
+	os.Exit(code)
 }
 
 func BenchmarkHuge(b *testing.B) {

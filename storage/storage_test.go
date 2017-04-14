@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/go-microservices/resizer/input"
-	"github.com/go-microservices/resizer/option"
-	"github.com/go-microservices/resizer/storage"
+	"github.com/minodisk/resizer/input"
+	"github.com/minodisk/resizer/option"
+	"github.com/minodisk/resizer/storage"
 )
 
 var s *storage.Storage
