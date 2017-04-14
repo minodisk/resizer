@@ -1,0 +1,22 @@
+#!/bin/bash
+
+export USER=$(id -u):$(id -g)
+
+if [[ "$CIRCLECI" != "true" ]]; then
+  docker-compose stop
+  docker-compose rm -f
+  docker-compose \
+    -f docker-compose.yml \
+    -f docker-compose.bench.yml \
+    build
+fi
+
+docker-compose \
+  -f docker-compose.yml \
+  -f docker-compose.bench.yml \
+  up -d mysql
+sleep 10
+docker-compose \
+  -f docker-compose.yml \
+  -f docker-compose.bench.yml \
+  run app
