@@ -1,9 +1,0 @@
-version: '2'
-
-services:
-
-  app:
-    user: $USER
-    volumes:
-      - .:/go/src/github.com/go-microservices/resizer
-    command: sh -c "glide install"

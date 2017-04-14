@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
-	"github.com/go-microservices/resizer/log"
+	"github.com/minodisk/resizer/log"
 )
 
 const (

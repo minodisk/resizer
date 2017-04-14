@@ -11,22 +11,9 @@ _test
 *.[568vq]
 [568vq].out
 
-# git
+# Git
 .git
 
-# glide
-.glide
-vendor
-
-# gin
-gin-bin
-
-# secret
-.secret
-
-# Benchmark Logs
-.logs/*.log
-
-# Compiled File
-resizer
-dist
+# Credential
+*.aes
+*.env

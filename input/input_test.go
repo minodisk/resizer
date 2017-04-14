@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-microservices/resizer/input"
+	"github.com/minodisk/resizer/input"
 )
 
 func TestValidateURL(t *testing.T) {

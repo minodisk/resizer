@@ -2,22 +2,25 @@ version: '2'
 
 services:
 
-  app:
-    build:
-      context: .
-    environment:
-      ENVIRONMENT: development
-      GC_PROJECT_ID: syoya-tests
-      GC_STORAGE_BUCKET: resizer
-      GC_SERVICE_ACCOUNT: /secret/gcloud.json
-      MYSQL_DATA_SOURCE_NAME: root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True
-      ALLOWED_HOSTS: c6.staticflickr.com,c3.staticflickr.com
-      MAX_HTTP_CONNECTIONS: 10
+  resizer:
+    build: .
     depends_on:
       - mysql
+    environment:
+      ENVIRONMENT: development
+
+      GC_PROJECT_ID: syoya-witz
+      GC_STORAGE_BUCKET: resizer
+      # GC_SERVICE_ACCOUNT: /secret/gcloud.json
+      MYSQL_DATA_SOURCE_NAME: root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True
+      ALLOWED_HOSTS: resizer-fixtures.storage.googleapis.com
+      MAX_HTTP_CONNECTIONS: 10
+    volumes:
+      - .:/go/src/github.com/minodisk/resizer
+    command: sh test.sh
 
   mysql:
-    image: mysql:5.6
+    image: mysql:5.7
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_DATABASE: 'resizer'
