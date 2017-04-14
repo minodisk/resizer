@@ -9,9 +9,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/go-microservices/resizer/option"
-	"github.com/go-microservices/resizer/storage"
-	"github.com/go-microservices/resizer/uploader"
+	"github.com/minodisk/resizer/option"
+	"github.com/minodisk/resizer/storage"
+	"github.com/minodisk/resizer/uploader"
 )
 
 var u *uploader.Uploader

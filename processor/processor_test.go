@@ -6,9 +6,9 @@ import (
 	"math"
 	"testing"
 
-	"github.com/go-microservices/resizer/input"
-	"github.com/go-microservices/resizer/processor"
-	"github.com/go-microservices/resizer/storage"
+	"github.com/minodisk/resizer/input"
+	"github.com/minodisk/resizer/processor"
+	"github.com/minodisk/resizer/storage"
 )
 
 const (

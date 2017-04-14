@@ -17,9 +17,9 @@ import (
 	"sync"
 
 	"github.com/BurntSushi/graphics-go/graphics/interp"
-	"github.com/go-microservices/resizer/input"
-	"github.com/go-microservices/resizer/log"
-	"github.com/go-microservices/resizer/storage"
+	"github.com/minodisk/resizer/input"
+	"github.com/minodisk/resizer/log"
+	"github.com/minodisk/resizer/storage"
 	"github.com/nfnt/resize"
 	"github.com/rwcarlsen/goexif/exif"
 )

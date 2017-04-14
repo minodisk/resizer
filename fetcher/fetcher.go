@@ -10,7 +10,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/go-microservices/resizer/log"
+	"github.com/minodisk/resizer/log"
 	"github.com/pkg/errors"
 )
 

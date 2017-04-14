@@ -10,7 +10,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/go-microservices/resizer/input"
+	"github.com/minodisk/resizer/input"
 	uuid "github.com/satori/go.uuid"
 )
 
