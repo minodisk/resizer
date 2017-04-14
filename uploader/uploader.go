@@ -6,9 +6,9 @@ import (
 	"io"
 
 	gcs "cloud.google.com/go/storage"
-	"github.com/go-microservices/resizer/log"
-	"github.com/go-microservices/resizer/option"
-	"github.com/go-microservices/resizer/storage"
+	"github.com/minodisk/resizer/log"
+	"github.com/minodisk/resizer/option"
+	"github.com/minodisk/resizer/storage"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	opt "google.golang.org/api/option"

@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-microservices/resizer/fetcher"
+	"github.com/minodisk/resizer/fetcher"
 )
 
 var (

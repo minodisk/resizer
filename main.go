@@ -3,7 +3,7 @@ package main
 import (
 	"runtime"
 
-	"github.com/go-microservices/resizer/server"
+	"github.com/minodisk/resizer/server"
 )
 
 func main() {
