@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+
+  app:
+    user: $USER
+    environment:
+      RESIZER_ENV: test
+    volumes:
+      - ./.logs:/go/src/github.com/go-microservices/resizer/.logs
+    command: |-
+      sh -c " \
+        mkdir -p ./.logs && \
+        go test \
+          -bench . \
+          -benchmem \
+          . \
+          ./fetcher/... \
+          ./input/... \
+          ./option/... \
+          ./orientation/... \
+          ./processor/... \
+          ./server/... \
+          ./storage/... \
+          ./uploader/... \
+        | \
+        tee ./.logs/`date +'%Y%m%d%H%M%S'`.log \
+        && \
+        benchcmp `ls -t -r ./.logs/*.log | head -1` `ls -t ./.logs/*.log | head -1` \
+      "

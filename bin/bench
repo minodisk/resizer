@@ -7,16 +7,16 @@ if [[ "$CIRCLECI" != "true" ]]; then
   docker-compose rm -f
   docker-compose \
     -f docker-compose.yml \
-    -f docker-compose.test.yml \
+    -f docker-compose.bench.yml \
     build
 fi
 
 docker-compose \
   -f docker-compose.yml \
-  -f docker-compose.test.yml \
+  -f docker-compose.bench.yml \
   up -d mysql
 sleep 10
 docker-compose \
   -f docker-compose.yml \
-  -f docker-compose.test.yml \
+  -f docker-compose.bench.yml \
   run app
