@@ -55,15 +55,6 @@ func Read(r io.Reader) (int, error) {
 // Returns a new oriented image.
 // When o is invalid as orientation tag, returns error.
 func Orient(s image.Image, o int) (image.Image, error) {
-	// rect := s.Bounds()
-	// if o >= 5 && o <= 8 {
-	// 	rect = SwapRect(rect)
-	// }
-	// d := image.NewRGBA64(rect)
-	// a := affines[o]
-	// a.TransformCenter(d, s, interp.Bilinear)
-	// return d, nil
-
 	switch o {
 	case Orientation1:
 		return Orient1(s), nil

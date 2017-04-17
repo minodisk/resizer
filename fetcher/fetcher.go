@@ -4,13 +4,13 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"os"
 	"path"
 	"time"
 
-	"github.com/minodisk/resizer/log"
 	"github.com/pkg/errors"
 )
 

@@ -2,6 +2,7 @@
 
 set -e
 
+mkdir -p /secret
 printf "%s" "$GOOGLE_AUTH_JSON" > /secret/google-auth.json
 
 echo "" > coverage.txt
