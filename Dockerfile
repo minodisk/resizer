@@ -6,7 +6,7 @@ RUN mkdir -p /secret && \
     go get -u \
       github.com/golang/dep/...
 COPY . .
-# RUN go build .
+RUN go build .
 
 CMD echo $GOOGLE_AUTH_JSON > /secret/google-auth.json && \
     resizer
