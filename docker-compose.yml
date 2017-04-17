@@ -6,21 +6,21 @@ services:
     build: .
     depends_on:
       - mysql
+    env_file: secret.env
     environment:
       ENVIRONMENT: development
-
       GC_PROJECT_ID: syoya-witz
       GC_STORAGE_BUCKET: resizer
-      # GC_SERVICE_ACCOUNT: /secret/gcloud.json
+      GC_SERVICE_ACCOUNT: /secret/google-auth.json
       MYSQL_DATA_SOURCE_NAME: root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True
-      ALLOWED_HOSTS: resizer-fixtures.storage.googleapis.com
+      ALLOWED_HOSTS: resizer.storage.googleapis.com
       MAX_HTTP_CONNECTIONS: 10
     volumes:
       - .:/go/src/github.com/minodisk/resizer
     command: sh test.sh
 
   mysql:
-    image: mysql:5.7
+    image: mysql:5.6
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_DATABASE: 'resizer'

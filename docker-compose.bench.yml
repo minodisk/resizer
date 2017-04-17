@@ -7,7 +7,7 @@ services:
     environment:
       RESIZER_ENV: test
     volumes:
-      - ./.logs:/go/src/github.com/go-microservices/resizer/.logs
+      - ./.logs:/go/src/github.com/minodisk/resizer/.logs
     command: |-
       sh -c " \
         mkdir -p ./.logs && \

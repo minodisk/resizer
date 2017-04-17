@@ -3,6 +3,7 @@ package storage
 import (
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
@@ -32,6 +33,13 @@ func New(o option.Option) (*Storage, error) {
 	}
 	db.CreateTable(&Image{})
 	db.AutoMigrate(&Image{})
+
+	for {
+		if err := db.DB().Ping(); err == nil {
+			break
+		}
+		time.Sleep(time.Second)
+	}
 
 	return &Storage{db}, nil
 }

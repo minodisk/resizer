@@ -38,7 +38,7 @@ func TestMain(m *testing.M) {
 	}
 
 	h, err := server.NewHandler(option.Option{
-		GCServiceAccount:    "/secret/gcloud.json",
+		GCServiceAccount:    "/secret/google-auth.json",
 		MysqlDataSourceName: "root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True",
 		AllowedHosts:        []string{u.Host},
 	})
