@@ -124,7 +124,7 @@ func (self *Processor) Resize(i image.Image, w io.Writer, f storage.Image) (*ima
 	default:
 		return nil, fmt.Errorf("Unsupported format: %s", f.ValidatedFormat)
 	case input.FormatJPEG:
-		if err := jpeg.Encode(w, ir, &jpeg.Options{int(f.ValidatedQuality)}); err != nil {
+		if err := jpeg.Encode(w, ir, &jpeg.Options{Quality: int(f.ValidatedQuality)}); err != nil {
 			return nil, err
 		}
 	case input.FormatPNG:

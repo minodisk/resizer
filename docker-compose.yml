@@ -8,7 +8,6 @@ services:
       - mysql
     env_file: secret.env
     environment:
-      ENVIRONMENT: development
       GC_PROJECT_ID: syoya-witz
       GC_STORAGE_BUCKET: resizer
       GC_SERVICE_ACCOUNT: /secret/google-auth.json

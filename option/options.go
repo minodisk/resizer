@@ -57,19 +57,19 @@ func (os Options) Find(rawurl string) (NewOption, error) {
 }
 
 type GoogleCloud struct {
-	ProjectID         string `json:"project_id",yaml:"project_id"`
-	ServiceAccount    string `json:"service_account",yaml:"service_account"`
-	StorageBucketName string `json:"storage_bucket_name",yaml:"storage_bucket_name"`
+	ProjectID         string `json:"project_id"`
+	ServiceAccount    string `json:"service_account"`
+	StorageBucketName string `json:"storage_bucket_name"`
 }
 
 type MySQL struct {
-	DataSourceName string `json:"data_source_name",yaml:"data_source_name"`
+	DataSourceName string `json:"data_source_name"`
 }
 
 type NewOption struct {
-	MaxHTTPConnections int         `json:"max_http_connections",yaml:"max_http_connections"`
-	GoogleCloud        GoogleCloud `json:"google_cloud",yaml:"google_cloud"`
-	MySQL              MySQL       `json:"mysql",yaml:"mysql"`
+	MaxHTTPConnections int         `json:"max_http_connections"`
+	GoogleCloud        GoogleCloud `json:"google_cloud"`
+	MySQL              MySQL       `json:"mysql"`
 }
 
 type Option struct {

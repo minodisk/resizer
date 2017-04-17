@@ -57,7 +57,7 @@ func TestLoad(t *testing.T) {
 	for _, c := range cases {
 		o, ok := os[c.Key]
 		if !ok {
-			t.Errorf("the key `%s` expected existing, but actual not")
+			t.Errorf("the key `%s` expected existing, but actual not", c.Key)
 			continue
 		}
 		if a, e := o, c.Option; !reflect.DeepEqual(a, e) {
