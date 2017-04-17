@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minodisk/resizer/option"
+	"github.com/minodisk/resizer/options"
 	"github.com/minodisk/resizer/server"
 	"github.com/pkg/errors"
 )
@@ -37,10 +37,12 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	h, err := server.NewHandler(option.Option{
-		GCServiceAccount:    "/secret/google-auth.json",
-		MysqlDataSourceName: "root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True",
-		AllowedHosts:        []string{u.Host},
+	h, err := server.NewHandler(options.Options{
+		ServiceAccount: options.ServiceAccount{
+			Path: "/secret/google-auth.json",
+		},
+		DataSourceName: "root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True",
+		AllowedHosts:   []string{u.Host},
 	})
 	if err != nil {
 		panic(err)
@@ -115,7 +117,7 @@ var (
 	rTitle   = regexp.MustCompile(`<title>(\d+ .+)<\/title>`)
 	rH1      = regexp.MustCompile(`<h1>(.+)<\/h1>`)
 	rP       = regexp.MustCompile(`<p>(.+)<\/p>`)
-	rAddress = regexp.MustCompile(`<address>(.+)\/(.+)<\/address>`)
+	rAddress = regexp.MustCompile(`<address>(.+)<\/address>`)
 )
 
 func TestFail(t *testing.T) {

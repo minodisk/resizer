@@ -6,10 +6,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"testing"
 
-	"github.com/minodisk/resizer/option"
+	"github.com/minodisk/resizer/options"
 	"github.com/minodisk/resizer/storage"
 	"github.com/minodisk/resizer/uploader"
 )
@@ -18,13 +17,18 @@ var u *uploader.Uploader
 
 func TestNew(t *testing.T) {
 	var err error
-	o, err := option.New(os.Args[1:])
+	o := options.Options{
+		Bucket: "resizer",
+		ServiceAccount: options.ServiceAccount{
+			Path: "/secret/google-auth.json",
+		},
+	}
 	if err != nil {
-		t.Fatalf("fail to create options: error=%v", err)
+		t.Fatalf("fail to create options: %v", err)
 	}
 	u, err = uploader.New(o)
 	if err != nil {
-		t.Fatalf("fail to new: error=%v", err)
+		t.Fatalf("fail to new: %v", err)
 	}
 }
 
@@ -63,16 +67,14 @@ func TestUpload(t *testing.T) {
 	}
 	b := string(body)
 	if b != content {
-		t.Fatalf("wrong body: expected %s, but actual %s", content, b)
+		t.Errorf("wrong body: expected %s, but actual %s", content, b)
 	}
 }
 
 func TestCreateURL(t *testing.T) {
-	bucket := os.Getenv("GC_STORAGE_BUCKET")
-	path := "baz"
-	expected := fmt.Sprintf("https://%s.storage.googleapis.com/%s", bucket, path)
-	actual := u.CreateURL(path)
+	expected := "https://resizer.storage.googleapis.com/baz"
+	actual := u.CreateURL("baz")
 	if actual != expected {
-		t.Fatalf("fail to create URL: expected %s, but actual %s", expected, actual)
+		t.Errorf("fail to create URL: expected %s, but actual %s", expected, actual)
 	}
 }

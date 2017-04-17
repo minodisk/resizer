@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 
 	gcs "cloud.google.com/go/storage"
 
 	opt "google.golang.org/api/option"
 
-	"github.com/minodisk/resizer/log"
-	"github.com/minodisk/resizer/option"
+	"github.com/minodisk/resizer/options"
 	"github.com/minodisk/resizer/storage"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
@@ -28,17 +28,16 @@ type Uploader struct {
 }
 
 // New はアップローダーを作成する。
-func New(o option.Option) (*Uploader, error) {
+func New(o options.Options) (*Uploader, error) {
 	ctx := context.Background()
-	client, err := gcs.NewClient(ctx, opt.WithScopes(gcs.ScopeFullControl), opt.WithServiceAccountFile(o.GCServiceAccount))
+	client, err := gcs.NewClient(ctx, opt.WithScopes(gcs.ScopeFullControl), opt.WithServiceAccountFile(o.ServiceAccount.Path))
 	if err != nil {
 		return nil, errors.Wrap(err, "can't create client for GCS")
 	}
-	bkt := client.Bucket(o.GCStorageBucket)
 	return &Uploader{
 		context:    ctx,
-		bucket:     bkt,
-		bucketName: o.GCStorageBucket,
+		bucket:     client.Bucket(o.Bucket),
+		bucketName: o.Bucket,
 	}, nil
 }
 
@@ -52,6 +51,7 @@ func (u *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error) {
 	if err := w.Close(); err != nil {
 		return "", errors.Wrap(err, "can't close object writer")
 	}
+
 	log.Printf("Write %d bytes object '%s' in bucket '%s'\n", written, f.Filename, u.bucketName)
 
 	attrs, err := object.Update(u.context, gcs.ObjectAttrsToUpdate{
@@ -61,6 +61,7 @@ func (u *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "can't update object attributes")
 	}
+
 	log.Printf("Attributes: %+v\n", *attrs)
 
 	url := u.CreateURL(f.Filename)
