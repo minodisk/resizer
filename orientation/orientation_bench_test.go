@@ -3,8 +3,8 @@ package orientation_test
 import (
 	"testing"
 
-	"github.com/go-microservices/resizer/orientation"
-	"github.com/go-microservices/resizer/processor"
+	"github.com/minodisk/resizer/orientation"
+	"github.com/minodisk/resizer/processor"
 )
 
 func orient(b *testing.B, filename string, o int) {
