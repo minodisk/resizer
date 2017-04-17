@@ -14,7 +14,6 @@ import (
 
 const (
 	AllowedHosts        = "ALLOWED_HOSTS"
-	Environment         = "ENVIRONMENT"
 	GCProjectID         = "GC_PROJECT_ID"
 	GCStorageBucket     = "GC_STORAGE_BUCKET"
 	GCServiceAccount    = "GC_SERVICE_ACCOUNT"
@@ -83,10 +82,6 @@ type Option struct {
 }
 
 func New(args []string) (Option, error) {
-	env := os.Getenv(Environment)
-	if env == "" {
-		env = "production"
-	}
 	maxConn, err := strconv.Atoi(os.Getenv(MaxHTTPConnections))
 	return Option{
 		AllowedHosts:        strings.Split(os.Getenv(AllowedHosts), ","),
