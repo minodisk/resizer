@@ -9,10 +9,10 @@
 
 ## Installation
 
-Download binary for your environment from [latest release](https://github.com/go-microservices/resizer/releases/latest), or `go get` like:
+Download binary for your environment from [latest release](https://github.com/minodisk/resizer/releases/latest), or `go get` like:
 
 ```bash
-go get -u github.com/go-microservices/resizer/...
+go get -u github.com/minodisk/resizer/...
 ```
 
 ## Usage

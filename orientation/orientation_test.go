@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/go-microservices/resizer/orientation"
+	"github.com/minodisk/resizer/orientation"
 )
 
 type Pixels struct {
