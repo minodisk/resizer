@@ -7,7 +7,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
-	"github.com/minodisk/resizer/option"
+	"github.com/minodisk/resizer/options"
 	"github.com/pkg/errors"
 )
 
@@ -21,11 +21,11 @@ type Storage struct {
 	*gorm.DB
 }
 
-func New(o option.Option) (*Storage, error) {
+func New(o options.Options) (*Storage, error) {
 	var db *gorm.DB
 	for {
 		var err error
-		db, err = gorm.Open("mysql", o.MysqlDataSourceName)
+		db, err = gorm.Open("mysql", o.DataSourceName)
 		if err == nil {
 			break
 		}

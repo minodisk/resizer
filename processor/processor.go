@@ -11,11 +11,11 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"log"
 	"os"
 	"sync"
 
 	"github.com/minodisk/resizer/input"
-	"github.com/minodisk/resizer/log"
 	"github.com/minodisk/resizer/orientation"
 	"github.com/minodisk/resizer/storage"
 	"github.com/nfnt/resize"

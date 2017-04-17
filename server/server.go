@@ -6,6 +6,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -14,8 +15,7 @@ import (
 	"github.com/alecthomas/template"
 	"github.com/minodisk/resizer/fetcher"
 	"github.com/minodisk/resizer/input"
-	"github.com/minodisk/resizer/log"
-	"github.com/minodisk/resizer/option"
+	"github.com/minodisk/resizer/options"
 	"github.com/minodisk/resizer/processor"
 	"github.com/minodisk/resizer/storage"
 	"github.com/minodisk/resizer/uploader"
@@ -34,7 +34,7 @@ const (
   <h1>{{ .StatusText }}</h1>
   <p>{{ .Message }}</p>
   <hr>
-  <address>{{ .AppName }}/{{ .AppVersion }}</address>
+  <address>{{ .AppName }}</address>
 </body>
 </html>
 `
@@ -54,7 +54,6 @@ type ErrorHTML struct {
 	StatusText string
 	Message    string
 	AppName    string
-	AppVersion string
 }
 
 func NewErrorHTML(code int, message string) ErrorHTML {
@@ -63,7 +62,6 @@ func NewErrorHTML(code int, message string) ErrorHTML {
 		StatusText: http.StatusText(code),
 		Message:    message,
 		AppName:    "Resizer",
-		AppVersion: "0.0.1",
 	}
 }
 
@@ -76,24 +74,24 @@ func init() {
 }
 
 func Start() error {
-	o, err := option.New(os.Args[1:])
+	options, err := options.Parse(os.Args[1:])
 	if err != nil {
 		return err
 	}
-	handler, err := NewHandler(o)
+	handler, err := NewHandler(options)
 	if err != nil {
 		return err
 	}
-	s := http.Server{
+	server := http.Server{
 		Handler:        &handler,
 		ReadTimeout:    10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	l, err := net.Listen("tcp", addr)
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", options.Port))
 	if err != nil {
 		return err
 	}
-	if err := s.Serve(netutil.LimitListener(l, o.MaxHTTPConnections)); err != nil {
+	if err := server.Serve(netutil.LimitListener(listener, options.MaxHTTPConnections)); err != nil {
 		return errors.Wrap(err, "fail to serve")
 	}
 	return nil
@@ -105,7 +103,7 @@ type Handler struct {
 	Hosts    []string
 }
 
-func NewHandler(o option.Option) (Handler, error) {
+func NewHandler(o options.Options) (Handler, error) {
 	s, err := storage.New(o)
 	if err != nil {
 		return Handler{}, err
@@ -252,7 +250,7 @@ func (h *Handler) save(b []byte, f storage.Image) {
 	// 13. アップロードする
 	// 14. キャッシュをDBに格納する
 	if _, err := h.Uploader.Upload(bytes.NewBuffer(b), f); err != nil {
-		log.Printf("fail to upload: error=%v\n", err)
+		log.Println(errors.Wrap(err, "fail to upload"))
 		return
 	}
 	h.Storage.NewRecord(f)
