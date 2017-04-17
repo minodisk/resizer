@@ -1,4 +1,5 @@
-# resizer
+# resizer [ ![Codeship Status for minodisk/resizer](https://app.codeship.com/projects/13aaf0c0-0354-0135-03f6-4ebd009726c2/status?branch=master)](https://app.codeship.com/projects/213308) [![Go Report Card](https://goreportcard.com/badge/github.com/minodisk/resizer)](https://goreportcard.com/report/github.com/minodisk/resizer) [![codecov](https://codecov.io/gh/minodisk/resizer/branch/master/graph/badge.svg)](https://codecov.io/gh/minodisk/resizer) [![GoDoc](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat)](https://godoc.org/github.com/minodisk/resizer) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+
 
 ## Specification
 
@@ -9,10 +10,10 @@
 
 ## Installation
 
-Download binary for your environment from [latest release](https://github.com/go-microservices/resizer/releases/latest), or `go get` like:
+Download binary for your environment from [latest release](https://github.com/minodisk/resizer/releases/latest), or `go get` like:
 
 ```bash
-go get -u github.com/go-microservices/resizer/...
+go get -u github.com/minodisk/resizer/...
 ```
 
 ## Usage

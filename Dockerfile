@@ -1,10 +1,12 @@
 FROM golang:1.8.1
 
-WORKDIR /go/src/github.com/go-microservices/resizer
+WORKDIR /go/src/github.com/minodisk/resizer
 
-RUN go get -u \
+RUN mkdir -p /secret && \
+    go get -u \
       github.com/golang/dep/...
 COPY . .
-# RUN go build .
+RUN go build .
 
-# CMD resizer
+CMD echo $GOOGLE_AUTH_JSON > /secret/google-auth.json && \
+    resizer

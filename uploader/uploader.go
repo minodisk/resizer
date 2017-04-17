@@ -6,12 +6,14 @@ import (
 	"io"
 
 	gcs "cloud.google.com/go/storage"
+
+	opt "google.golang.org/api/option"
+
 	"github.com/minodisk/resizer/log"
 	"github.com/minodisk/resizer/option"
 	"github.com/minodisk/resizer/storage"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
-	opt "google.golang.org/api/option"
 )
 
 const (
@@ -33,7 +35,11 @@ func New(o option.Option) (*Uploader, error) {
 		return nil, errors.Wrap(err, "can't create client for GCS")
 	}
 	bkt := client.Bucket(o.GCStorageBucket)
-	return &Uploader{ctx, bkt, o.GCStorageBucket}, nil
+	return &Uploader{
+		context:    ctx,
+		bucket:     bkt,
+		bucketName: o.GCStorageBucket,
+	}, nil
 }
 
 func (u *Uploader) Upload(buf *bytes.Buffer, f storage.Image) (string, error) {
