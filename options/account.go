@@ -2,7 +2,6 @@ package options
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"strings"
 
@@ -17,7 +16,7 @@ type ServiceAccount struct {
 }
 
 func (a *ServiceAccount) String() string {
-	return fmt.Sprintf("%+v", *a)
+	return a.ClientEmail
 }
 
 func (a *ServiceAccount) Set(path string) error {
