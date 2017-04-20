@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
-	"strings"
+
+	"github.com/minodisk/resizer/options"
 )
 
 const (
@@ -82,9 +83,9 @@ func New(q map[string][]string) (Input, error) {
 	return o, nil
 }
 
-func (i Input) Validate(hosts []string) (Input, error) {
+func (i Input) Validate(allowedHosts options.Hosts) (Input, error) {
 	var err error
-	i, err = i.ValidateURL(hosts)
+	i, err = i.ValidateURL(allowedHosts)
 	if err != nil {
 		return i, err
 	}
@@ -103,7 +104,7 @@ func (i Input) Validate(hosts []string) (Input, error) {
 	return i, nil
 }
 
-func (i Input) ValidateURL(allowedHosts []string) (Input, error) {
+func (i Input) ValidateURL(allowedHosts options.Hosts) (Input, error) {
 	if i.URL == "" {
 		return i, fmt.Errorf("URL shouldn't be empty")
 	}
@@ -114,14 +115,7 @@ func (i Input) ValidateURL(allowedHosts []string) (Input, error) {
 	if !in(u.Scheme, allowedSchemes) {
 		return i, NewInvalidSchemeError(u.Scheme)
 	}
-	var hosts []string
-	for _, h := range allowedHosts {
-		hosts = append(hosts, h)
-		if strings.Index(h, ":") == -1 {
-			hosts = append(hosts, fmt.Sprintf("%s:80", h))
-		}
-	}
-	if !in(u.Host, hosts) {
+	if !allowedHosts.Contains(u.Host) {
 		return i, NewInvalidHostError(u.Host)
 	}
 	return i, nil

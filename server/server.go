@@ -9,7 +9,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/alecthomas/template"
@@ -73,12 +72,8 @@ func init() {
 	}
 }
 
-func Start() error {
-	options, err := options.Parse(os.Args[1:])
-	if err != nil {
-		return err
-	}
-	handler, err := NewHandler(options)
+func Start(o options.Options) error {
+	handler, err := NewHandler(o)
 	if err != nil {
 		return err
 	}
@@ -87,20 +82,26 @@ func Start() error {
 		ReadTimeout:    10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", options.Port))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", o.Port))
 	if err != nil {
 		return err
 	}
-	if err := server.Serve(netutil.LimitListener(listener, options.MaxHTTPConnections)); err != nil {
+
+	log.Printf("listening on port %d", o.Port)
+
+	if o.MaxHTTPConnections > 0 {
+		listener = netutil.LimitListener(listener, o.MaxHTTPConnections)
+	}
+	if err := server.Serve(listener); err != nil {
 		return errors.Wrap(err, "fail to serve")
 	}
 	return nil
 }
 
 type Handler struct {
+	Options  options.Options
 	Storage  *storage.Storage
 	Uploader *uploader.Uploader
-	Hosts    []string
 }
 
 func NewHandler(o options.Options) (Handler, error) {
@@ -112,8 +113,11 @@ func NewHandler(o options.Options) (Handler, error) {
 	if err != nil {
 		return Handler{}, err
 	}
-	h := o.AllowedHosts
-	return Handler{s, u, h}, nil
+	return Handler{
+		Options:  o,
+		Storage:  s,
+		Uploader: u,
+	}, nil
 }
 
 // ServeHTTP はリクエストに応じて処理を行いレスポンスする。
@@ -149,7 +153,7 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	input, err = input.Validate(h.Hosts)
+	input, err = input.Validate(h.Options.AllowedHosts)
 	if err != nil {
 		return err
 	}
@@ -173,7 +177,7 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 	if cache.ID != 0 {
 		log.Printf("validated cache %+v exists, requested with %+v\n", cache, i)
 		url := h.Uploader.CreateURL(cache.Filename)
-		http.Redirect(resp, req, url, http.StatusSeeOther)
+		http.Redirect(resp, req, url, http.StatusFound)
 		return nil
 	}
 	log.Printf("validated cache doesn't exist, requested with %+v\n", i)
@@ -217,7 +221,7 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 	if cache.ID != 0 {
 		log.Printf("normalized cache %+v exists, requested with %+v\n", cache, i)
 		url := h.Uploader.CreateURL(cache.Filename)
-		http.Redirect(resp, req, url, http.StatusSeeOther)
+		http.Redirect(resp, req, url, http.StatusFound)
 		return nil
 	}
 	log.Printf("normalized cache doesn't exist, requested with %+v\n", i)
@@ -232,7 +236,7 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 	b = buf.Bytes()
 
 	i.ETag = fmt.Sprintf("%x", md5.Sum(b))
-	i.Filename = i.CreateFilename()
+	i.Filename = i.CreateFilename(h.Options)
 	i.ContentType = contentTypes[i.ValidatedFormat]
 	i.CanvasWidth = size.X
 	i.CanvasHeight = size.Y
