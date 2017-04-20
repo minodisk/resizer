@@ -1,16 +1,12 @@
 package testutil
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sync"
-
-	"cloud.google.com/go/storage"
-
-	"google.golang.org/api/option"
 )
 
 const (
@@ -22,33 +18,22 @@ func DownloadFixtures(names ...string) error {
 		return err
 	}
 
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithServiceAccountFile(GoogleAuthFilename))
-	if err != nil {
-		return err
-	}
-	bkt := client.Bucket("resizer")
-
 	var wg sync.WaitGroup
 	var e chan error
 	for _, name := range names {
-		obj := bkt.Object(fmt.Sprintf("fixtures/%s", name))
-		attrs, err := obj.Attrs(ctx)
-		if err != nil {
-			return err
-		}
-		if _, err := os.Stat(attrs.Name); err == nil {
+		if _, err := os.Stat(name); err == nil {
 			continue
 		}
 
 		wg.Add(1)
-		go func(attrs *storage.ObjectAttrs) {
+		go func(filename string) {
 			if err := func() error {
-				resp, err := http.Get(attrs.MediaLink)
+				url := fmt.Sprintf("https://resizer.storage.googleapis.com/fixtures/%s", filename)
+				resp, err := http.Get(url)
 				if err != nil {
 					return err
 				}
-				file, err := os.Create(attrs.Name)
+				file, err := os.Create(filepath.Join(DirFixtures, filename))
 				if err != nil {
 					return err
 				}
@@ -61,7 +46,7 @@ func DownloadFixtures(names ...string) error {
 				e <- err
 			}
 			wg.Done()
-		}(attrs)
+		}(name)
 	}
 	go func() {
 		for {

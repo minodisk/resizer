@@ -55,9 +55,6 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	if err := testutil.CreateGoogleAuthFile(); err != nil {
-		panic(err)
-	}
 	if err := testutil.DownloadFixtures(
 		"f-png24.png",
 		"f.jpg",
@@ -79,9 +76,6 @@ func TestMain(m *testing.M) {
 	code := m.Run()
 	if err := testutil.RemoveFixtures(); err != nil {
 		fmt.Println(err)
-	}
-	if err := testutil.RemoveGoogleAuthFile(); err != nil {
-		panic(err)
 	}
 	os.Exit(code)
 }

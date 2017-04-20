@@ -57,10 +57,10 @@ func TestMain(m *testing.M) {
 	appServer.Close()
 	fixturesServer.Close()
 
-	if err := testutil.RemoveFixtures(); err != nil {
+	if err := testutil.RemoveGoogleAuthFile(); err != nil {
 		panic(err)
 	}
-	if err := testutil.RemoveGoogleAuthFile(); err != nil {
+	if err := testutil.RemoveFixtures(); err != nil {
 		panic(err)
 	}
 
