@@ -1,4 +1,4 @@
-memo = "81d0c3d76798bc5881467aff165a02728fdd9ac2378fcebc3afd88f12c050f86"
+memo = "5db165a0f3c21d7c0becfef2553fd6da793444fadaa080f30d898f892c64fb7c"
 
 [[projects]]
   name = "cloud.google.com/go"
@@ -8,21 +8,9 @@ memo = "81d0c3d76798bc5881467aff165a02728fdd9ac2378fcebc3afd88f12c050f86"
 
 [[projects]]
   branch = "master"
-  name = "github.com/BurntSushi/graphics-go"
-  packages = ["graphics","graphics/convolve","graphics/interp"]
-  revision = "b43f31a4a96688fba0b612e25e22648b9267e498"
-
-[[projects]]
-  branch = "master"
   name = "github.com/alecthomas/template"
   packages = [".","parse"]
   revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
-
-[[projects]]
-  name = "github.com/ghodss/yaml"
-  packages = ["."]
-  revision = "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"
-  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
@@ -113,9 +101,3 @@ memo = "81d0c3d76798bc5881467aff165a02728fdd9ac2378fcebc3afd88f12c050f86"
   packages = [".","codes","credentials","credentials/oauth","grpclog","internal","keepalive","metadata","naming","peer","stats","tap","transport"]
   revision = "8050b9cbc271307e5a716a9d782803d09b0d6f2d"
   version = "v1.2.1"
-
-[[projects]]
-  branch = "v2"
-  name = "gopkg.in/yaml.v2"
-  packages = ["."]
-  revision = "cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b"
