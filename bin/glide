@@ -1,8 +1,0 @@
-#!/bin/bash
-
-export USER=$(id -u):$(id -g)
-
-docker-compose \
-  -f docker-compose.yml \
-  -f docker-compose.glide.yml \
-  run app sh -c "glide $@"
