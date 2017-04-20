@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"path"
 	"reflect"
 	"testing"
 
 	"github.com/minodisk/resizer/fetcher"
+	"github.com/minodisk/resizer/testutil"
 )
 
 var (
@@ -18,16 +18,18 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	if err := testutil.DownloadFixtures("f-png24.png"); err != nil {
+		panic(err)
+	}
+
 	mockServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		dir, err := os.Getwd()
-		if err != nil {
-			panic(err)
-		}
-		p := path.Join(dir, "..", "fixtures", r.URL.Path[1:])
-		http.ServeFile(w, r, p)
+		http.ServeFile(w, r, testutil.DirFixtures)
 	}))
 
 	code := m.Run()
+	if err := testutil.RemoveFixtures(); err != nil {
+		fmt.Println(err)
+	}
 	os.Exit(code)
 }
 

@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -15,6 +15,7 @@ import (
 
 	"github.com/minodisk/resizer/options"
 	"github.com/minodisk/resizer/server"
+	"github.com/minodisk/resizer/testutil"
 	"github.com/pkg/errors"
 )
 
@@ -24,13 +25,15 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	if err := testutil.CreateGoogleAuthFile(); err != nil {
+		panic(err)
+	}
+	if err := testutil.DownloadFixtures("f-png24.png"); err != nil {
+		panic(err)
+	}
+
 	fixturesServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		dir, err := os.Getwd()
-		if err != nil {
-			panic(err)
-		}
-		p := path.Join(dir, "..", "fixtures", r.URL.Path[1:])
-		http.ServeFile(w, r, p)
+		http.ServeFile(w, r, filepath.Join(testutil.DirFixtures, r.URL.Path[1:]))
 	}))
 	u, err := url.Parse(fixturesServer.URL)
 	if err != nil {
@@ -39,7 +42,7 @@ func TestMain(m *testing.M) {
 
 	h, err := server.NewHandler(options.Options{
 		ServiceAccount: options.ServiceAccount{
-			Path: "/secret/google-auth.json",
+			Path: testutil.GoogleAuthFilename,
 		},
 		DataSourceName: "root:@tcp(mysql:3306)/resizer?charset=utf8&parseTime=True",
 		AllowedHosts:   []string{u.Host},
@@ -54,25 +57,37 @@ func TestMain(m *testing.M) {
 	appServer.Close()
 	fixturesServer.Close()
 
+	if err := testutil.RemoveGoogleAuthFile(); err != nil {
+		panic(err)
+	}
+	if err := testutil.RemoveFixtures(); err != nil {
+		panic(err)
+	}
+
 	os.Exit(c)
 }
 
 func TestNew(t *testing.T) {
-	func() {
+	t.Run("1st time", func(t *testing.T) {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				t.Error("request at the 1st time shouldn't be redirected")
+				t.Fatalf("shouldn't be redirected")
 				return nil
 			},
 		}
 		resp, err := client.Get(fmt.Sprintf("%s?width=15&url=%s/f-png24.png", appServer.URL, fixturesServer.URL))
 		if err != nil {
-			t.Fatalf("fail to get resized image at the 1st time: error=%v", err)
+			t.Fatalf("fail to get resized image: %+v", err)
 		}
 		if resp.StatusCode != http.StatusOK {
-			t.Errorf("1st time should response as OK: expected %d, but actual %d", http.StatusOK, resp.StatusCode)
+			defer resp.Body.Close()
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatalf("body is empty")
+			}
+			t.Errorf("status code isn't OK: %s", b)
 		}
-	}()
+	})
 
 	time.Sleep(time.Second * 5)
 
