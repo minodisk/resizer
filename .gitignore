@@ -17,3 +17,9 @@ _test
 # Credential
 *.aes
 *.env
+google-auth.json
+
+# Binaries
+*.jpg
+*.png
+*.gif

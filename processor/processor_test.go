@@ -2,36 +2,39 @@ package processor_test
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	"math"
+	"os"
 	"testing"
 
 	"github.com/minodisk/resizer/input"
 	"github.com/minodisk/resizer/processor"
 	"github.com/minodisk/resizer/storage"
+	"github.com/minodisk/resizer/testutil"
 )
 
 const (
 	u   = 3
-	png = "../fixtures/f-png24.png"
+	png = "fixtures/f-png24.png"
 )
 
 var (
 	formats = []string{
-		"../fixtures/f.jpg",
-		"../fixtures/f-png8.png",
-		"../fixtures/f-png24.png",
-		"../fixtures/f.gif",
+		"fixtures/f.jpg",
+		"fixtures/f-png8.png",
+		"fixtures/f-png24.png",
+		"fixtures/f.gif",
 	}
 	orientations = []string{
-		"../fixtures/f-orientation-1.jpg",
-		"../fixtures/f-orientation-2.jpg",
-		"../fixtures/f-orientation-3.jpg",
-		"../fixtures/f-orientation-4.jpg",
-		"../fixtures/f-orientation-5.jpg",
-		"../fixtures/f-orientation-6.jpg",
-		"../fixtures/f-orientation-7.jpg",
-		"../fixtures/f-orientation-8.jpg",
+		"fixtures/f-orientation-1.jpg",
+		"fixtures/f-orientation-2.jpg",
+		"fixtures/f-orientation-3.jpg",
+		"fixtures/f-orientation-4.jpg",
+		"fixtures/f-orientation-5.jpg",
+		"fixtures/f-orientation-6.jpg",
+		"fixtures/f-orientation-7.jpg",
+		"fixtures/f-orientation-8.jpg",
 	}
 	raw = []int{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -50,6 +53,32 @@ var (
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	}
 )
+
+func TestMain(m *testing.M) {
+	if err := testutil.DownloadFixtures(
+		"f-png24.png",
+		"f.jpg",
+		"f-png8.png",
+		"f-png24.png",
+		"f.gif",
+		"f-orientation-1.jpg",
+		"f-orientation-2.jpg",
+		"f-orientation-3.jpg",
+		"f-orientation-4.jpg",
+		"f-orientation-5.jpg",
+		"f-orientation-6.jpg",
+		"f-orientation-7.jpg",
+		"f-orientation-8.jpg",
+	); err != nil {
+		panic(err)
+	}
+
+	code := m.Run()
+	if err := testutil.RemoveFixtures(); err != nil {
+		fmt.Println(err)
+	}
+	os.Exit(code)
+}
 
 func diff(a, b uint32) uint32 {
 	if a > b {

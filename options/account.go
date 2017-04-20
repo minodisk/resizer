@@ -13,6 +13,7 @@ type ServiceAccount struct {
 	Path        string `json:"-"`
 	ClientEmail string `json:"client_email"`
 	PrivateKey  string `json:"private_key"`
+	ProjectID   string `json:"project_id"`
 }
 
 func (a *ServiceAccount) String() string {
