@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/minodisk/resizer/input"
+	"github.com/minodisk/resizer/options"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -184,7 +185,13 @@ func (i Image) serializeNormalizedProps() (Image, error) {
 	return i, nil
 }
 
-func (i Image) CreateFilename() string {
+func (i Image) CreateFilename(o options.Options) string {
 	id := uuid.NewV4().String()
-	return fmt.Sprintf("%s.%s", id, i.ValidatedFormat)
+	ext, ok := map[string]string{
+		"jpeg": "jpg",
+	}[i.ValidatedFormat]
+	if !ok {
+		ext = i.ValidatedFormat
+	}
+	return fmt.Sprintf("%s%s.%s", o.ObjectPrefix, id, ext)
 }
