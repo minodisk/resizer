@@ -8,169 +8,120 @@ import (
 )
 
 func TestValidateURL(t *testing.T) {
-	type Input struct {
-		Input input.Input
-		Hosts []string
-	}
-	type Expected struct {
-		Input input.Input
-		Error error
-	}
-	type Case struct {
-		Spec     string
-		Input    Input
-		Expected Expected
-	}
+	t.Parallel()
 
-	cases := []Case{
+	for _, c := range []struct {
+		name  string
+		input input.Input
+		hosts []string
+		want  input.Input
+		err   error
+	}{
 		{
-			Spec: "allow http",
-			Input: Input{
-				Input: input.Input{
-					URL: "http://example.com",
-				},
-				Hosts: []string{
-					"example.com",
-				},
+			"allow http",
+			input.Input{
+				URL: "http://example.com",
 			},
-			Expected: Expected{
-				Input: input.Input{
-					URL: "http://example.com",
-				},
-				Error: nil,
+			[]string{
+				"example.com",
 			},
+			input.Input{
+				URL: "http://example.com",
+			},
+			nil,
 		},
 		{
-			Spec: "allow https",
-			Input: Input{
-				Input: input.Input{
-					URL: "https://foo.example.com",
-				},
-				Hosts: []string{
-					"example.com",
-					"foo.example.com",
-				},
+			"allow https",
+			input.Input{
+				URL: "https://foo.example.com",
 			},
-			Expected: Expected{
-				Input: input.Input{
-					URL: "https://foo.example.com",
-				},
-				Error: nil,
+			[]string{
+				"example.com",
+				"foo.example.com",
 			},
+			input.Input{
+				URL: "https://foo.example.com",
+			},
+			nil,
 		},
 		{
-			Spec: "not allow any other scheme",
-			Input: Input{
-				Input: input.Input{
-					URL: "ftp://example.com",
-				},
-				Hosts: []string{
-					"example.com",
-				},
+			"not allow any other scheme",
+			input.Input{
+				URL: "ftp://example.com",
 			},
-			Expected: Expected{
-				Input: input.Input{
-					URL: "ftp://example.com",
-				},
-				Error: input.NewInvalidSchemeError("ftp"),
+			[]string{
+				"example.com",
 			},
+			input.Input{
+				URL: "ftp://example.com",
+			},
+			input.NewInvalidSchemeError("ftp"),
 		},
 		{
-			Spec: "not allow unspecified hosts",
-			Input: Input{
-				Input: input.Input{
-					URL: "http://foo.example.com",
-				},
-				Hosts: []string{
-					"example.com",
-				},
+			"not allow unspecified hosts",
+			input.Input{
+				URL: "http://foo.example.com",
 			},
-			Expected: Expected{
-				Input: input.Input{
-					URL: "http://foo.example.com",
-				},
-				Error: input.NewInvalidHostError("foo.example.com"),
+			[]string{
+				"example.com",
 			},
+			input.Input{
+				URL: "http://foo.example.com",
+			},
+			input.NewInvalidHostError("foo.example.com"),
 		},
 		{
-			Spec: "Can specify multi-hosts",
-			Input: Input{
-				Input: input.Input{
-					URL: "http://foo.example.com",
-				},
-				Hosts: []string{
-					"example.com",
-					"foo.example.com",
-				},
+			"Can specify multi-hosts",
+			input.Input{
+				URL: "http://foo.example.com",
 			},
-			Expected: Expected{
-				Input: input.Input{
-					URL: "http://foo.example.com",
-				},
-				Error: nil,
+			[]string{
+				"example.com",
+				"foo.example.com",
 			},
+			input.Input{
+				URL: "http://foo.example.com",
+			},
+			nil,
 		},
 		{
-			Spec: "allow port 80",
-			Input: Input{
-				Input: input.Input{
-					URL: "http://example.com:80",
-				},
-				Hosts: []string{
-					"example.com",
-				},
+			"not allow any other port",
+			input.Input{
+				URL: "http://example.com:8080",
 			},
-			Expected: Expected{
-				Input: input.Input{
-					URL: "http://example.com:80",
-				},
-				Error: nil,
+			[]string{
+				"example.com",
 			},
+			input.Input{
+				URL: "http://example.com:8080",
+			},
+			input.NewInvalidHostError("example.com:8080"),
 		},
 		{
-			Spec: "not allow any other port",
-			Input: Input{
-				Input: input.Input{
-					URL: "http://example.com:8080",
-				},
-				Hosts: []string{
-					"example.com",
-				},
+			"Can specify host with port",
+			input.Input{
+				URL: "http://example.com:8080",
 			},
-			Expected: Expected{
-				Input: input.Input{
-					URL: "http://example.com:8080",
-				},
-				Error: input.NewInvalidHostError("example.com:8080"),
+			[]string{
+				"example.com:8080",
 			},
+			input.Input{
+				URL: "http://example.com:8080",
+			},
+			nil,
 		},
-		{
-			Spec: "Can specify host with port",
-			Input: Input{
-				Input: input.Input{
-					URL: "http://example.com:8080",
-				},
-				Hosts: []string{
-					"example.com:8080",
-				},
-			},
-			Expected: Expected{
-				Input: input.Input{
-					URL: "http://example.com:8080",
-				},
-				Error: nil,
-			},
-		},
-	}
-
-	for _, c := range cases {
-		output, err := c.Input.Input.ValidateURL(c.Input.Hosts)
-		if !reflect.DeepEqual(output, c.Expected.Input) {
-			t.Errorf("ValidateURL() should %s.\nOutput expected `%v`, but actual `%v`", c.Spec, c.Expected.Input, output)
-		}
-		if !reflect.DeepEqual(err, c.Expected.Error) {
-			t.Errorf("ValidateURL() should %s.\nError expected `%v`, but actual `%v`", c.Spec, c.Expected.Error, err)
-		}
+	} {
+		c := c
+		t.Run(c.name, func(t *testing.T) {
+			t.Parallel()
+			got, err := c.input.ValidateURL(c.hosts)
+			if !reflect.DeepEqual(got, c.want) {
+				t.Errorf("result\n got: %+v\nwant: %+v", got, c.want)
+			}
+			if !reflect.DeepEqual(err, c.err) {
+				t.Errorf("error\n got: %+v\nwant: %+v", err, c.err)
+			}
+		})
 	}
 }
 
