@@ -181,6 +181,7 @@ func (h *Handler) operate(resp http.ResponseWriter, req *http.Request) error {
 	// 5. 元画像を取得する
 	// 6. リサイズの前処理をする
 	filename, err := fetcher.Fetch(i.ValidatedURL)
+	fmt.Printf("URL: %s, Filename: %s\n", i.ValidatedURL, filename)
 	defer func() {
 		if err := fetcher.Clean(filename); err != nil {
 			log.Printf("fail to clean fetched file: %s\n", filename)
