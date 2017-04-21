@@ -1,11 +1,24 @@
 package options_test
 
 import (
+	"os"
 	"reflect"
 	"testing"
 
 	"github.com/minodisk/resizer/options"
+	"github.com/minodisk/resizer/testutil"
 )
+
+func TestMain(m *testing.M) {
+	if err := testutil.CreateGoogleAuthFile(); err != nil {
+		panic(err)
+	}
+	code := m.Run()
+	if err := testutil.RemoveGoogleAuthFile(); err != nil {
+		panic(err)
+	}
+	os.Exit(code)
+}
 
 func TestParse(t *testing.T) {
 	t.Parallel()
@@ -40,7 +53,47 @@ func TestParse(t *testing.T) {
 			name string
 			args []string
 			want options.Options
-		}{} {
+		}{
+			{
+				"default",
+				[]string{},
+				options.Options{
+					AllowedHosts:       options.Hosts{},
+					Bucket:             "",
+					DataSourceName:     "",
+					MaxHTTPConnections: 0,
+					ObjectPrefix:       "",
+					Port:               80,
+					ServiceAccountFile: "",
+					Verbose:            false,
+				},
+			},
+			{
+				"overwrite",
+				[]string{
+					"-host", "foo",
+					"-bucket", "bar",
+					"-dsn", "baz",
+					"-connections", "16",
+					"-prefix", "qux",
+					"-port", "9000",
+					"-account", "google-auth.json",
+					"-verbose", "true",
+				},
+				options.Options{
+					AllowedHosts: options.Hosts{
+						"foo",
+					},
+					Bucket:             "bar",
+					DataSourceName:     "baz",
+					MaxHTTPConnections: 16,
+					ObjectPrefix:       "qux",
+					Port:               9000,
+					ServiceAccountFile: "google-auth.json",
+					Verbose:            true,
+				},
+			},
+		} {
 			c := c
 			t.Run(c.name, func(t *testing.T) {
 				t.Parallel()

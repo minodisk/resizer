@@ -1,6 +1,9 @@
 package options
 
-import "flag"
+import (
+	"flag"
+	"fmt"
+)
 
 type Options struct {
 	AllowedHosts       Hosts
@@ -9,7 +12,7 @@ type Options struct {
 	MaxHTTPConnections int
 	ObjectPrefix       string
 	Port               int
-	ServiceAccount     ServiceAccount
+	ServiceAccountFile string
 	Verbose            bool
 }
 
@@ -28,8 +31,21 @@ func Parse(args []string) (Options, error) {
 	fs.StringVar(&o.ObjectPrefix, "prefix", "", `Prefix of object name.`)
 	fs.IntVar(&o.Port, "port", 80, `Port to be listened.
 		`)
-	fs.Var(&o.ServiceAccount, "account", `Path to the file of Google service account JSON.`)
+	fs.StringVar(&o.ServiceAccountFile, "account", "", `Path to the file of Google service account JSON.`)
 	fs.BoolVar(&o.Verbose, "verbose", false, `Verbose output.`)
 
 	return o, fs.Parse(args)
+}
+
+func (o Options) Validate() error {
+	if o.Bucket == "" {
+		return fmt.Errorf("bucket is required")
+	}
+	if o.DataSourceName == "" {
+		return fmt.Errorf("dsn is required")
+	}
+	if o.ServiceAccountFile == "" {
+		return fmt.Errorf("account is required")
+	}
+	return nil
 }
