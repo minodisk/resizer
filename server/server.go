@@ -122,13 +122,6 @@ func NewHandler(o options.Options) (Handler, error) {
 
 // ServeHTTP はリクエストに応じて処理を行いレスポンスする。
 func (h *Handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	if req.URL.Path != "/" {
-		resp.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(resp, "Not Found")
-		log.Printf("'%s' not found\n", req.URL.Path)
-		return
-	}
-
 	if err := h.operate(resp, req); err != nil {
 		log.Println(errors.Wrap(err, "fail to operate"))
 		resp.WriteHeader(http.StatusBadRequest)
