@@ -30,7 +30,7 @@ type Uploader struct {
 // New はアップローダーを作成する。
 func New(o options.Options) (*Uploader, error) {
 	ctx := context.Background()
-	client, err := gcs.NewClient(ctx, opt.WithScopes(gcs.ScopeFullControl), opt.WithServiceAccountFile(o.ServiceAccount.Path))
+	client, err := gcs.NewClient(ctx, opt.WithScopes(gcs.ScopeFullControl), opt.WithServiceAccountFile(o.ServiceAccountFile))
 	if err != nil {
 		return nil, errors.Wrap(err, "can't create client for GCS")
 	}

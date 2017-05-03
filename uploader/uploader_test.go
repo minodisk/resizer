@@ -18,10 +18,8 @@ var u *uploader.Uploader
 func TestNew(t *testing.T) {
 	var err error
 	o := options.Options{
-		Bucket: "resizer",
-		ServiceAccount: options.ServiceAccount{
-			Path: "/secret/google-auth.json",
-		},
+		Bucket:             "resizer",
+		ServiceAccountFile: "google-auth.json",
 	}
 	if err != nil {
 		t.Fatalf("fail to create options: %v", err)
