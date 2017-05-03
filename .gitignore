@@ -23,3 +23,7 @@ google-auth.json
 *.jpg
 *.png
 *.gif
+
+# Test
+coverage.txt
+profile.out

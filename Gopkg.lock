@@ -1,4 +1,4 @@
-memo = "5db165a0f3c21d7c0becfef2553fd6da793444fadaa080f30d898f892c64fb7c"
+memo = "166f5305a905837ac9454e43d3a5fc177b1234d8e868500280b3b21b40c68ee2"
 
 [[projects]]
   name = "cloud.google.com/go"
@@ -41,6 +41,12 @@ memo = "5db165a0f3c21d7c0becfef2553fd6da793444fadaa080f30d898f892c64fb7c"
   name = "github.com/jinzhu/inflection"
   packages = ["."]
   revision = "1c35d901db3da928c72a72d8458480cc9ade058f"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/minodisk/orientation"
+  packages = ["."]
+  revision = "8445e82d7cdaf3c6bd8a6806b80bbfdd9bdb23e9"
 
 [[projects]]
   branch = "master"
