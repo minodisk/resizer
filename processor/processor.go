@@ -15,8 +15,8 @@ import (
 	"os"
 	"sync"
 
+	"github.com/minodisk/orientation"
 	"github.com/minodisk/resizer/input"
-	"github.com/minodisk/resizer/orientation"
 	"github.com/minodisk/resizer/storage"
 	"github.com/nfnt/resize"
 	"github.com/pkg/errors"
@@ -62,25 +62,17 @@ func (p *Processor) process(m *sync.Mutex, c chan Result, path string, w io.Writ
 // When orientation tag exists in EXIF, orient pixels in
 // image.
 func (self *Processor) Preprocess(filename string) (image.Image, error) {
-	src, format, err := Load(filename)
-	if err != nil {
-		return nil, errors.Wrapf(err, "fail to load image")
-	}
-
-	// Finish, when format isn't JPEG.
-	if format != input.FormatJPEG {
-		return src, nil
-	}
-
-	f, err := os.Open(filename)
+	src, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer src.Close()
 
-	dst, err := orientation.Apply(f, src)
+	dst, err := orientation.Apply(src)
 	if err != nil {
-		return nil, errors.Wrapf(err, "fail to apply orientation")
+		if err, ok := err.(*orientation.DecodeError); ok {
+			return nil, errors.Wrap(err, "fail to apply orientation")
+		}
 	}
 
 	return dst, nil

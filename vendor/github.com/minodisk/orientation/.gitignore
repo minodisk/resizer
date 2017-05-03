@@ -11,19 +11,21 @@ _test
 *.[568vq]
 [568vq].out
 
-# Git
-.git
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+
+_testmain.go
+
+*.exe
+*.test
+*.prof
 
 # Credential
 *.aes
 *.env
-google-auth.json
 
-# Binaries
-*.jpg
-*.png
-*.gif
-
-# Test
-coverage.txt
-profile.out
+# Vendor
+vendor
