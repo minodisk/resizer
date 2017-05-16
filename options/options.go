@@ -18,9 +18,10 @@ func Parse(args []string) (Options, error) {
 
 	fs := flag.NewFlagSet("resizer", flag.ContinueOnError)
 	fs.Var(&o.AllowedHosts, "host", `Hosts of the image that is allowed to resize.
-	        When this value isn't specified, all hosts are allowed.
-	        You can set multi hosts with:
-	           $ resizer -host a.com -host b.com`)
+         When this value isn't specified, all hosts are allowed.
+         Multiple hosts can be specified with:
+             $ resizer -host a.com,b.com
+             $ resizer -host a.com -host b.com`)
 	fs.StringVar(&o.Bucket, "bucket", "", `Bucket name of Google Cloud Storage to upload the resized image.`)
 	fs.StringVar(&o.DataSourceName, "dsn", "", `Data source name of database to store resizing information.`)
 	fs.IntVar(&o.MaxHTTPConnections, "connections", 0, `Max simultaneous connections to be accepted by server.

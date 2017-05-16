@@ -9,7 +9,9 @@ func (hs *Hosts) String() string {
 }
 
 func (hs *Hosts) Set(host string) error {
-	*hs = append(*hs, host)
+	for _, h := range strings.Split(host, ",") {
+		*hs = append(*hs, strings.TrimSpace(h))
+	}
 	return nil
 }
 
