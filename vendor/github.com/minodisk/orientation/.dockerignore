@@ -1,0 +1,6 @@
+# Vendoring
+vendor
+
+# Credential
+*.aes
+*.env
