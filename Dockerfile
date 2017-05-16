@@ -5,5 +5,6 @@ WORKDIR /go/src/github.com/minodisk/resizer
 RUN go get -u \
       github.com/golang/dep/...
 COPY . .
+RUN dep ensure
 
 CMD resizer -help

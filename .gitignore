@@ -27,3 +27,6 @@ google-auth.json
 # Test
 coverage.txt
 profile.out
+
+# Vendor
+vendor

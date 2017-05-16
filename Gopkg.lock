@@ -1,4 +1,4 @@
-memo = "166f5305a905837ac9454e43d3a5fc177b1234d8e868500280b3b21b40c68ee2"
+memo = "a613b275f4d0ed69002c39b1fd13dc91f0f7b94243358699c0763714894d5c89"
 
 [[projects]]
   name = "cloud.google.com/go"
