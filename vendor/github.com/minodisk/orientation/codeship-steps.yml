@@ -1,3 +1,0 @@
-- name: Test orientation
-  service: go
-  command: sh test.sh
