@@ -1,11 +1,16 @@
 package options
 
 import (
+	"encoding/json"
 	"flag"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 const (
+	EnvGoogleAuthJSON = "GOOGLE_AUTH_JSON"
+
 	EnvGoogleApplicationCredentials = "GOOGLE_APPLICATION_CREDENTIALS"
 	EnvAccount                      = "RESIZER_ACCOUNT"
 	EnvBucket                       = "RESIZER_BUCKET"
@@ -70,6 +75,17 @@ type Options struct {
 }
 
 func (o *Options) Parse(args []string) error {
+	if v := os.Getenv(EnvGoogleAuthJSON); v != "" {
+		b := []byte(v)
+		if err := json.Unmarshal(b, &o.ServiceAccount); err != nil {
+			return err
+		}
+		o.ServiceAccount.Path = filepath.Join(os.TempDir(), "resizer-google-auth.json")
+		if err := ioutil.WriteFile(o.ServiceAccount.Path, b, 0644); err != nil {
+			return err
+		}
+	}
+
 	fs := flag.NewFlagSet("resizer", flag.ContinueOnError)
 	fs.Var(&o.ServiceAccount, "account", `Path to the file of Google service account JSON.`)
 	fs.StringVar(&o.Bucket, "bucket", "", `Bucket name of Google Cloud Storage to upload the resized image.`)
@@ -84,7 +100,7 @@ func (o *Options) Parse(args []string) error {
              $ resizer -host a.com -host b.com`)
 	fs.IntVar(&o.Port, "port", 80, `Port to be listened.
          `)
-	fs.StringVar(&o.ObjectPrefix, "prefix", "resized/", ``)
+	fs.StringVar(&o.ObjectPrefix, "prefix", "", ``)
 	fs.BoolVar(&o.Verbose, "verbose", false, `Verbose output.
          `)
 	for _, env := range Envs {

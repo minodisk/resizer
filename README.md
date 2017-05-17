@@ -19,7 +19,7 @@ go get -u github.com/minodisk/resizer/...
 ## Usage
 
 ```bash
-./resizer
+resizer
 ```
 
 ### Environment variables
@@ -68,12 +68,11 @@ The size of resized image in pixel. In default `0`.
 
 #### `method`
 
-How to resize. `normal` or `thumbnail`. Optional. In default `normal`.
+How to resize. `contain` or `cover`. Optional. In default `contain`.
 
-- When `width` or `height` is `0`, specified `method` is ignored and resizer resizes `normal`.
-  - `width` and `height` shouldn't be specified with `0`, when method is `thumbnail`.
-- When specifies `normal`, resizer resizes image to fall into the specified size and doesn't clip.
-- When specifies `thumbnail`, resizer resizes image to fill all pixels in the specified size and clips the outer of the specified size.
+- When `width` or `height` is `0`, specified `method` is ignored and resizer resizes with `contain` method.
+- When specifies `contain`, resizer resizes image to fall into the specified size and doesn't clip.
+- When specifies `cover`, resizer resizes image to fill all pixels in the specified size and clips the outer of the specified size.
 
 #### `format`
 

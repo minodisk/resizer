@@ -9,6 +9,11 @@ import (
 )
 
 func TestOptions(t *testing.T) {
+	if j := os.Getenv(options.EnvGoogleAuthJSON); j != "" {
+		os.Unsetenv(options.EnvGoogleAuthJSON)
+		defer os.Setenv(options.EnvGoogleAuthJSON, j)
+	}
+
 	for _, c := range []struct {
 		name string
 		envs map[string]string
@@ -26,8 +31,7 @@ func TestOptions(t *testing.T) {
 					"a.com",
 					"b.com",
 				},
-				ObjectPrefix: "resized/",
-				Port:         80,
+				Port: 80,
 			},
 		},
 		{
@@ -42,8 +46,7 @@ func TestOptions(t *testing.T) {
 					"a.com",
 					"b.com",
 				},
-				ObjectPrefix: "resized/",
-				Port:         80,
+				Port: 80,
 			},
 		},
 		{
@@ -59,8 +62,7 @@ func TestOptions(t *testing.T) {
 					"b.com",
 					"c.com",
 				},
-				ObjectPrefix: "resized/",
-				Port:         80,
+				Port: 80,
 			},
 		},
 		{
@@ -70,9 +72,8 @@ func TestOptions(t *testing.T) {
 			},
 			[]string{},
 			&options.Options{
-				Bucket:       "foo",
-				ObjectPrefix: "resized/",
-				Port:         80,
+				Bucket: "foo",
+				Port:   80,
 			},
 		},
 		{
@@ -82,9 +83,8 @@ func TestOptions(t *testing.T) {
 				"-bucket", "bar",
 			},
 			&options.Options{
-				Bucket:       "bar",
-				ObjectPrefix: "resized/",
-				Port:         80,
+				Bucket: "bar",
+				Port:   80,
 			},
 		},
 		{
@@ -96,9 +96,8 @@ func TestOptions(t *testing.T) {
 				"-bucket", "bar",
 			},
 			&options.Options{
-				Bucket:       "bar",
-				ObjectPrefix: "resized/",
-				Port:         80,
+				Bucket: "bar",
+				Port:   80,
 			},
 		},
 	} {

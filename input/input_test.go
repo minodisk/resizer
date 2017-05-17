@@ -252,12 +252,12 @@ func TestValidateMethod(t *testing.T) {
 			Spec: "allow normal method",
 			Input: Input{
 				Input: input.Input{
-					Method: input.MethodNormal,
+					Method: input.MethodContain,
 				},
 			},
 			Expected: Expected{
 				Input: input.Input{
-					Method: input.MethodNormal,
+					Method: input.MethodContain,
 				},
 				Error: nil,
 			},
@@ -266,12 +266,12 @@ func TestValidateMethod(t *testing.T) {
 			Spec: "allow thumbnail method",
 			Input: Input{
 				Input: input.Input{
-					Method: input.MethodThumbnail,
+					Method: input.MethodCover,
 				},
 			},
 			Expected: Expected{
 				Input: input.Input{
-					Method: input.MethodThumbnail,
+					Method: input.MethodCover,
 				},
 				Error: nil,
 			},

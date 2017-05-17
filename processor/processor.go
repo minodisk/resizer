@@ -102,9 +102,9 @@ func (self *Processor) Resize(i image.Image, w io.Writer, f storage.Image) (*ima
 	switch f.ValidatedMethod {
 	default:
 		return nil, fmt.Errorf("Unsupported method: %s", f.ValidatedMethod)
-	case input.MethodNormal:
+	case input.MethodContain:
 		ir = resize.Resize(uint(f.DestWidth), uint(f.DestHeight), i, resize.Lanczos3)
-	case input.MethodThumbnail:
+	case input.MethodCover:
 		cr := image.Rect(0, 0, f.CanvasWidth, f.CanvasHeight)
 		src := resize.Resize(uint(f.DestWidth), uint(f.DestHeight), i, resize.Lanczos3)
 		dst := image.NewRGBA(cr)

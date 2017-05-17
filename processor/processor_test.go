@@ -176,7 +176,7 @@ func TestFormats(t *testing.T) {
 	}
 	for _, format := range []string{input.FormatPNG, input.FormatJPEG, input.FormatGIF} {
 		f := storage.Image{
-			ValidatedMethod:  input.MethodNormal,
+			ValidatedMethod:  input.MethodContain,
 			ValidatedWidth:   5,
 			ValidatedHeight:  7,
 			ValidatedFormat:  format,
@@ -190,7 +190,7 @@ func TestFormats(t *testing.T) {
 
 func TestOrientations(t *testing.T) {
 	f := storage.Image{
-		ValidatedMethod: input.MethodNormal,
+		ValidatedMethod: input.MethodContain,
 		ValidatedWidth:  5,
 		ValidatedHeight: 7,
 		ValidatedFormat: input.FormatPNG,
@@ -222,13 +222,13 @@ func TestFormatNormal(t *testing.T) {
 		0, 0, 0, 0, 0,
 	}
 	eval(t, png, storage.Image{
-		ValidatedMethod: input.MethodNormal,
+		ValidatedMethod: input.MethodContain,
 		ValidatedWidth:  5,
 		ValidatedHeight: 100,
 		ValidatedFormat: input.FormatPNG,
 	}, size, colors)
 	eval(t, png, storage.Image{
-		ValidatedMethod: input.MethodNormal,
+		ValidatedMethod: input.MethodContain,
 		ValidatedWidth:  100,
 		ValidatedHeight: 7,
 		ValidatedFormat: input.FormatPNG,
@@ -237,7 +237,7 @@ func TestFormatNormal(t *testing.T) {
 
 func TestFormatThumbnail(t *testing.T) {
 	eval(t, png, storage.Image{
-		ValidatedMethod: input.MethodThumbnail,
+		ValidatedMethod: input.MethodCover,
 		ValidatedWidth:  3,
 		ValidatedHeight: 7,
 		ValidatedFormat: input.FormatPNG,
@@ -252,7 +252,7 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: input.MethodThumbnail,
+		ValidatedMethod: input.MethodCover,
 		ValidatedWidth:  5,
 		ValidatedHeight: 3,
 		ValidatedFormat: input.FormatPNG,
@@ -263,7 +263,7 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: input.MethodThumbnail,
+		ValidatedMethod: input.MethodCover,
 		ValidatedWidth:  100,
 		ValidatedHeight: 100,
 		ValidatedFormat: input.FormatPNG,
@@ -285,7 +285,7 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: input.MethodThumbnail,
+		ValidatedMethod: input.MethodCover,
 		ValidatedWidth:  6,
 		ValidatedHeight: 100,
 		ValidatedFormat: input.FormatPNG,
@@ -307,7 +307,7 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: input.MethodThumbnail,
+		ValidatedMethod: input.MethodCover,
 		ValidatedWidth:  2,
 		ValidatedHeight: 100,
 		ValidatedFormat: input.FormatPNG,
@@ -329,7 +329,7 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: input.MethodThumbnail,
+		ValidatedMethod: input.MethodCover,
 		ValidatedWidth:  100,
 		ValidatedHeight: 10,
 		ValidatedFormat: input.FormatPNG,
@@ -347,7 +347,7 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: input.MethodThumbnail,
+		ValidatedMethod: input.MethodCover,
 		ValidatedWidth:  100,
 		ValidatedHeight: 6,
 		ValidatedFormat: input.FormatPNG,
@@ -361,7 +361,7 @@ func TestFormatThumbnail(t *testing.T) {
 	})
 
 	eval(t, png, storage.Image{
-		ValidatedMethod: input.MethodThumbnail,
+		ValidatedMethod: input.MethodCover,
 		ValidatedWidth:  100,
 		ValidatedHeight: 2,
 		ValidatedFormat: input.FormatPNG,

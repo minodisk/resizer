@@ -9,7 +9,8 @@ services:
     env_file: secret.env
     volumes:
       - .:/go/src/github.com/minodisk/resizer
-    command: sh test.sh
+    ports:
+      - 80:80
 
   mysql:
     image: mysql:5.6

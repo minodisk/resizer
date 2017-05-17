@@ -16,9 +16,9 @@ const (
 	KeyFormat  = "format"
 	KeyQuality = "quality"
 
-	MethodNormal    = "normal"
-	MethodThumbnail = "thumbnail"
-	MethodDefault   = MethodNormal
+	MethodContain = "contain"
+	MethodCover   = "cover"
+	MethodDefault = MethodContain
 
 	FormatJPEG    = "jpeg"
 	FormatPNG     = "png"
@@ -132,7 +132,7 @@ func (i Input) ValidateMethod() (Input, error) {
 	switch i.Method {
 	case "":
 		i.Method = MethodDefault
-	case MethodDefault, MethodThumbnail:
+	case MethodDefault, MethodCover:
 	default:
 		return i, NewInvalidMethodError(i.Method)
 	}
