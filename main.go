@@ -16,8 +16,8 @@ func main() {
 }
 
 func _main() error {
-	o, err := options.Parse(os.Args[1:])
-	if err != nil {
+	o := &options.Options{}
+	if err := o.Parse(os.Args[1:]); err != nil {
 		return err
 	}
 	return server.Start(o)

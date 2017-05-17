@@ -185,7 +185,7 @@ func (i Image) serializeNormalizedProps() (Image, error) {
 	return i, nil
 }
 
-func (i Image) CreateFilename(o options.Options) string {
+func (i Image) CreateFilename(o *options.Options) string {
 	id := uuid.NewV4().String()
 	ext, ok := map[string]string{
 		"jpeg": "jpg",

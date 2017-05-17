@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	h, err := server.NewHandler(options.Options{
+	h, err := server.NewHandler(&options.Options{
 		ServiceAccount: options.ServiceAccount{
 			Path: testutil.GoogleAuthFilename,
 		},

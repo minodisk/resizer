@@ -17,7 +17,7 @@ var u *uploader.Uploader
 
 func TestNew(t *testing.T) {
 	var err error
-	o := options.Options{
+	o := &options.Options{
 		Bucket: "resizer",
 		ServiceAccount: options.ServiceAccount{
 			Path: "/secret/google-auth.json",

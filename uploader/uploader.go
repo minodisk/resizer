@@ -28,7 +28,7 @@ type Uploader struct {
 }
 
 // New はアップローダーを作成する。
-func New(o options.Options) (*Uploader, error) {
+func New(o *options.Options) (*Uploader, error) {
 	ctx := context.Background()
 	client, err := gcs.NewClient(ctx, opt.WithScopes(gcs.ScopeFullControl), opt.WithServiceAccountFile(o.ServiceAccount.Path))
 	if err != nil {

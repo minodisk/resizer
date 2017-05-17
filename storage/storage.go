@@ -21,7 +21,7 @@ type Storage struct {
 	*gorm.DB
 }
 
-func New(o options.Options) (*Storage, error) {
+func New(o *options.Options) (*Storage, error) {
 	var db *gorm.DB
 	for {
 		var err error

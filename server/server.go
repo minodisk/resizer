@@ -72,7 +72,7 @@ func init() {
 	}
 }
 
-func Start(o options.Options) error {
+func Start(o *options.Options) error {
 	handler, err := NewHandler(o)
 	if err != nil {
 		return err
@@ -99,12 +99,12 @@ func Start(o options.Options) error {
 }
 
 type Handler struct {
-	Options  options.Options
+	Options  *options.Options
 	Storage  *storage.Storage
 	Uploader *uploader.Uploader
 }
 
-func NewHandler(o options.Options) (Handler, error) {
+func NewHandler(o *options.Options) (Handler, error) {
 	s, err := storage.New(o)
 	if err != nil {
 		return Handler{}, err
