@@ -7,4 +7,4 @@ RUN go get -u \
 COPY . .
 RUN go install .
 
-CMD resizer -help
+CMD resizer
